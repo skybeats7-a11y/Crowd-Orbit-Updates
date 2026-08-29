@@ -1,0 +1,25 @@
+tyle>
+</head><body>
+<div class="app" id="app">
+<header class="top"><div class="brand"><span class="mark"></span><span><strong>Crowd Orbit</strong><small>NETWORK INTELLIGENCE · SBM</small></span></div><span class="remote">REMOTE · v0.5.1</span></header>
+<section class="view active" id="home"></section><section class="view" id="people"></section><section class="view" id="radar"></section><section class="view" id="capture"></section><section class="view" id="settings"></section>
+</div>
+<nav class="nav"><button data-go="home" class="active"><b>⌾</b>Orbit</button><button data-go="radar"><b>◉</b>Radar</button><button data-go="people"><b>◎</b>People</button><button data-go="capture"><b>＋</b>Capture</button><button data-go="settings"><b>⋯</b>Settings</button></nav>
+<div id="drawer" class="drawer hidden"></div><div id="toast" class="toast"></div>
+<script>
+'use strict';
+const KEY='crowd_orbit_offline_v1';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString('en-GB');
+const now=()=>new Date().toISOString();
+const blank=()=>({version:2,nextPersonId:1,nextSeedId:1,nextCampaignId:1,nextInteractionId:1,people:[],seeds:[],campaigns:[],campaignPeople:[],interactions:[],goals:['Find Clients','Find Collaborators','Build Industry Relationships']});
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(!x)return blank();return {...blank(),...x,people:Array.isArray(x.people)?x.people:[],interactions:Array.isArray(x.interactions)?x.interactions:[],goals:Array.isArray(x.goals)?x.goals:blank().goals}}catch{return blank()}}
+let db=load();function save(){db.version=2;localStorage.setItem(KEY,JSON.stringify(db))}save();
+function toast(s){const e=$('#toast');e.textContent=s;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2300)}
+function initials(n){return String(n||'?').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
+function days(v){if(!v)return 999;return Math.max(0,Math.floor((Date.now()-new Date(v).getTime())/86400000)||0)}
+function ints(id){return db.interactions.filter(x=>Number(x.person_id)===Number(id)).sort((a,b)=>String(b.at).localeCompare(String(a.at)))}
+function view(p){const a=ints(p.id),last=a[0]?.at||p.last_interaction||'';return {...p,interaction_count:a.length,last_interaction:last,relationship_trend:!last?'New':days(last)<=7?'Getting closer':days(last)>=30?'Cooling':'Stable'}}
+function calcIQ(p){p=view(p);const rel=p.relationship==='Warm'?92:p.relationship==='2nd degree'?70:48;const role=['Artist','Producer','Manager','Engineer','Songwriter','DJ','A&R','Label','Media'].includes(p.role)?72:50;const reach=Math.min(95,35+Math.round(Math.log10(Math.max(1,Number(p.followers||0)))*13));const timing=p.last_interaction?Math.min(95,45+days(p.last_interaction)):72;return {relationship:rel,relevance:role,reach,timing,total:Math.round(rel*.35+role*.3+reach*.15+timing*.2)}}
+function parseSocial(text){const url=(String(text).match(/https?:\/\/[^\s]+/i)||[])[0]||'';if(!url)return null;let u;try{u=new URL(url)}catch{return null}const h=u.hostname.toLowerCase(),parts=u.pathname.split('/').filter(Boolean);let platform='',handle='';if(h.includes('instagram.com')){platform='Instagram';handle=parts[0]||''}else if(h.includes('tiktok.com')){platform='TikTok';handle=(parts.find(x=>x.startsWith('@'))||'').replace(/^@/,'')}else if(h==='x.com'||h.includes('twitter.com')){platform='X';handle=parts[0]||''}else if(h.includes('youtube.com')){platform='YouTube';handle=(parts.find(x=>x.startsWith('@'))||parts[0]||'').replace(/^@/,'')}else return null;if(!handle||['share','reel','reels','p','watch','shorts'].includes(handle.toLowerCase()))return null;handle='@'+handle.replace(/^@/,'');return {url,platform,handle,name:handle.slice(1).replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}
