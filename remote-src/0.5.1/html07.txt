@@ -1,0 +1,4 @@
+r||'Unknown error');return}if(r.uiVersion===r.installedVersion){if(s)s.textContent=`Crowd Orbit ${r.installedVersion} is current.`;return}if(s)s.textContent=`Installing ${r.uiVersion}…`;window.CrowdOrbitNative?.installUiUpdate?.(r.bundleUrl,r.sha256,r.uiVersion)},onInstallResult(raw){let r;try{r=JSON.parse(raw)}catch{return}const s=$('#ustatus');if(!r.ok){if(s)s.textContent='Update failed: '+(r.error||'Unknown error');return}if(s)s.textContent=`Updated to ${r.version}. Reloading…`;setTimeout(()=>window.CrowdOrbitNative?.reloadCrowdOrbit?.(),400)}};
+renderHome();handleShare();
+</script>
+</body></html>
