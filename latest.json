@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.5.0",
+  "uiVersion": "0.5.1",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.0.zip",
-  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "notes": "Crowd Orbit automatic update channel initialised"
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.1.zip",
+  "sha256": "0eac9175e979b179fe27843da1c88489107c17bf6b9015a07e737c07e5f5164c",
+  "notes": "Lighter creative-networking design, automatic social profile capture, richer People profiles and Orbit IQ relationship intelligence"
 }
