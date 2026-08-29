@@ -1,0 +1,50 @@
+name: Verify Crowd Orbit remote release
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/fix-v051-checksum.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify release ZIP and update live checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f ui-0.5.1.zip
+          unzip -t ui-0.5.1.zip
+          unzip -l ui-0.5.1.zip | grep -E '(^|[[:space:]])index\.html$'
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          bundle = Path('ui-0.5.1.zip')
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          manifest_path = Path('latest.json')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          manifest['uiVersion'] = '0.5.1'
+          manifest['minimumShell'] = '0.5.0'
+          manifest['bundleUrl'] = 'https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.1.zip'
+          manifest['sha256'] = digest
+          manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+          Path('ui-0.5.1.sha256').write_text(f'{digest}  ui-0.5.1.zip\n', encoding='utf-8')
+          print('Verified SHA-256:', digest)
+          PY
+
+      - name: Commit verified checksum
+        shell: bash
+        run: |
+          git config user.name 'Crowd Orbit Release Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add latest.json ui-0.5.1.sha256
+          git diff --cached --quiet && exit 0
+          git commit -m 'Verify Crowd Orbit v0.5.1 release checksum [skip ci]'
+          git push
