@@ -1,4 +1,4 @@
-name: Verify Crowd Orbit remote release
+name: Repair and verify Crowd Orbit remote release
 
 on:
   push:
@@ -11,18 +11,30 @@ permissions:
   contents: write
 
 jobs:
-  verify:
+  repair-and-verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verify release ZIP and update live checksum
+      - name: Repair published ZIP if it was stored as base64 text
         shell: bash
         run: |
           set -euo pipefail
           test -f ui-0.5.1.zip
-          unzip -t ui-0.5.1.zip
+          if unzip -t ui-0.5.1.zip >/dev/null 2>&1; then
+            echo 'Published bundle is already a valid ZIP.'
+          else
+            echo 'Published bundle is not a valid ZIP; attempting base64 repair.'
+            base64 -d ui-0.5.1.zip > ui-0.5.1.repaired.zip
+            unzip -t ui-0.5.1.repaired.zip
+            mv ui-0.5.1.repaired.zip ui-0.5.1.zip
+          fi
           unzip -l ui-0.5.1.zip | grep -E '(^|[[:space:]])index\.html$'
+
+      - name: Calculate checksum from exact published bytes
+        shell: bash
+        run: |
+          set -euo pipefail
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
@@ -34,19 +46,19 @@ jobs:
           manifest['minimumShell'] = '0.5.0'
           manifest['bundleUrl'] = 'https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.1.zip'
           manifest['sha256'] = digest
+          manifest['notes'] = 'Lighter creative-networking design, automatic social profile capture, richer People profiles and Orbit IQ relationship intelligence'
           manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
           Path('ui-0.5.1.sha256').write_text(f'{digest}  ui-0.5.1.zip\n', encoding='utf-8')
           print('Verified SHA-256:', digest)
           PY
 
-      - name: Commit verified checksum
+      - name: Commit repaired bundle and verified manifest
         shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'Crowd Orbit Release Bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add latest.json ui-0.5.1.sha256
+          git add ui-0.5.1.zip latest.json ui-0.5.1.sha256
           git diff --cached --quiet && exit 0
-          git commit -m 'Verify Crowd Orbit v0.5.1 release checksum [skip ci]'
+          git commit -m 'Repair and verify Crowd Orbit v0.5.1 release [skip ci]'
           git push
-
-# Triggered through the repository contents API so GitHub registers and runs the verifier.
