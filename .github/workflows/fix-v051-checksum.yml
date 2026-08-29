@@ -1,4 +1,4 @@
-name: Repair and verify Crowd Orbit remote release
+name: Build and verify Crowd Orbit remote release
 
 on:
   push:
@@ -11,48 +11,80 @@ permissions:
   contents: write
 
 jobs:
-  repair-and-verify:
+  build-and-verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Repair published ZIP if it was stored as base64 text
+      - name: Rebuild v0.5.1 source exactly
         shell: bash
         run: |
           set -euo pipefail
-          test -f ui-0.5.1.zip
-          if unzip -t ui-0.5.1.zip >/dev/null 2>&1; then
-            echo 'Published bundle is already a valid ZIP.'
-          else
-            echo 'Published bundle is not a valid ZIP; attempting base64 repair.'
-            base64 -d ui-0.5.1.zip > ui-0.5.1.repaired.zip
-            unzip -t ui-0.5.1.repaired.zip
-            mv ui-0.5.1.repaired.zip ui-0.5.1.zip
-          fi
+          mkdir -p build
+          cat \
+            remote-src/0.5.1/html00.txt \
+            remote-src/0.5.1/html01.txt \
+            remote-src/0.5.1/html02.txt \
+            remote-src/0.5.1/html03.txt \
+            remote-src/0.5.1/html04a.txt \
+            remote-src/0.5.1/html04b.txt \
+            remote-src/0.5.1/html05.txt \
+            remote-src/0.5.1/html06.txt \
+            remote-src/0.5.1/html07.txt > build/index.html
+          echo 'Expected source SHA-256: 766db15bd0b8a1cfc384e760bb59c9089bdf7fabb93b26770a3e733f00c048da'
+          echo 'Actual source SHA-256:'
+          sha256sum build/index.html
+          test "$(sha256sum build/index.html | awk '{print $1}')" = "766db15bd0b8a1cfc384e760bb59c9089bdf7fabb93b26770a3e733f00c048da"
+
+      - name: Validate JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('build/index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script>(.*?)</script>',s,re.S)
+          if not m:
+              raise SystemExit('No script block found')
+          Path('build/app-check.js').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check build/app-check.js
+          rm build/app-check.js
+
+      - name: Build and test exact release ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f ui-0.5.1.zip
+          (cd build && zip -q -9 ../ui-0.5.1.zip index.html)
+          unzip -t ui-0.5.1.zip
           unzip -l ui-0.5.1.zip | grep -E '(^|[[:space:]])index\.html$'
 
-      - name: Calculate checksum from exact published bytes
+      - name: Calculate checksum and update manifest
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
-          bundle = Path('ui-0.5.1.zip')
-          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
-          manifest_path = Path('latest.json')
-          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
-          manifest['uiVersion'] = '0.5.1'
-          manifest['minimumShell'] = '0.5.0'
-          manifest['bundleUrl'] = 'https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.1.zip'
-          manifest['sha256'] = digest
-          manifest['notes'] = 'Lighter creative-networking design, automatic social profile capture, richer People profiles and Orbit IQ relationship intelligence'
-          manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-          Path('ui-0.5.1.sha256').write_text(f'{digest}  ui-0.5.1.zip\n', encoding='utf-8')
-          print('Verified SHA-256:', digest)
+          bundle=Path('ui-0.5.1.zip')
+          digest=hashlib.sha256(bundle.read_bytes()).hexdigest()
+          p=Path('latest.json')
+          m=json.loads(p.read_text(encoding='utf-8'))
+          m.update({
+            'uiVersion':'0.5.1',
+            'minimumShell':'0.5.0',
+            'bundleUrl':'https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.1.zip',
+            'sha256':digest,
+            'notes':'Lighter creative-networking design, automatic social profile capture, richer People profiles and Orbit IQ relationship intelligence'
+          })
+          p.write_text(json.dumps(m,indent=2)+'\n',encoding='utf-8')
+          Path('ui-0.5.1.sha256').write_text(f'{digest}  ui-0.5.1.zip\n',encoding='utf-8')
+          print('Verified release SHA-256:',digest)
           PY
 
-      - name: Commit repaired bundle and verified manifest
+      - name: Commit exact verified release
         shell: bash
         run: |
           set -euo pipefail
@@ -60,5 +92,5 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add ui-0.5.1.zip latest.json ui-0.5.1.sha256
           git diff --cached --quiet && exit 0
-          git commit -m 'Repair and verify Crowd Orbit v0.5.1 release [skip ci]'
+          git commit -m 'Publish verified Crowd Orbit v0.5.1 remote release [skip ci]'
           git push
