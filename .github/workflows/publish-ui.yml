@@ -1,0 +1,100 @@
+name: Publish Crowd Orbit UI update
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "release-input/**"
+      - ".github/workflows/publish-ui.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read release metadata
+        id: meta
+        shell: bash
+        run: |
+          VERSION=$(python -c "import json; print(json.load(open('release-input/latest.json'))['uiVersion'])")
+          MINIMUM=$(python -c "import json; print(json.load(open('release-input/latest.json'))['minimumShell'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "minimum=$MINIMUM" >> "$GITHUB_OUTPUT"
+
+      - name: Assemble Crowd Orbit v0.6 interface
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION='${{ steps.meta.outputs.version }}'
+          rm -rf build-ui
+          mkdir build-ui
+          unzip -q ui-0.5.1.zip -d build-ui
+          cat release-input/offline-data.js.part* > build-ui/offline-data.js
+          cp release-input/v060.js build-ui/v060.js
+          cp release-input/v060.css build-ui/v060.css
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('build-ui/index.html')
+          s=p.read_text()
+          needle='<script src="v051.js" defer></script>'
+          if '<script src="v060.js" defer></script>' not in s:
+              if needle not in s:
+                  raise SystemExit('Could not locate v051.js script tag')
+              s=s.replace(needle, needle+'\n  <script src="v060.js" defer></script>')
+          p.write_text(s)
+
+          p=Path('build-ui/app.js')
+          s=p.read_text()
+          old="contact_email:$('#person-email').value,website:$('#person-website').value"
+          new="contact_email:$('#person-email').value,phone_number:$('#person-phone')?.value||'',website:$('#person-website').value"
+          if new not in s:
+              if old not in s:
+                  raise SystemExit('Could not locate person capture payload')
+              s=s.replace(old,new)
+          p.write_text(s)
+          PY
+          node --check build-ui/offline-data.js
+          node --check build-ui/app.js
+          node --check build-ui/v051.js
+          node --check build-ui/v060.js
+          (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
+          unzip -t "ui-$VERSION.zip"
+          ACTUAL=$(sha256sum "ui-$VERSION.zip" | awk '{print $1}')
+          printf '%s  %s\n' "$ACTUAL" "ui-$VERSION.zip" > "ui-$VERSION.sha256"
+          python - <<PY
+          import json
+          meta=json.load(open('release-input/latest.json'))
+          version=meta['uiVersion']
+          out={
+            'uiVersion': version,
+            'minimumShell': meta['minimumShell'],
+            'bundleUrl': f'https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-{version}.zip',
+            'sha256': '$ACTUAL',
+            'notes': meta['notes']
+          }
+          with open('latest.json','w') as f:
+            json.dump(out,f,indent=2)
+            f.write('\n')
+          PY
+
+      - name: Publish verified release
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION='${{ steps.meta.outputs.version }}'
+          git config user.name "Crowd Orbit Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add latest.json "ui-$VERSION.zip" "ui-$VERSION.sha256"
+          if git diff --cached --quiet; then
+            echo "Release already published."
+            exit 0
+          fi
+          git commit -m "Publish verified Crowd Orbit v$VERSION remote release [skip ci]"
+          git push
