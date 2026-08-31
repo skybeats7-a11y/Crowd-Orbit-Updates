@@ -37,22 +37,51 @@ jobs:
           cp release-input/v070.js build-ui/v070.js
           cp release-input/v070.css build-ui/v070.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
-          python - <<'PY'
+          python - <<PY
           from pathlib import Path
+          version='${{ steps.meta.outputs.version }}'
+
+          # Keep the Concept 2 app source, but stamp the actual release number into it.
+          js=Path('build-ui/v070.js')
+          s=js.read_text()
+          s=s.replace("const UI='0.7.0';", f"const UI='{version}';")
+          js.write_text(s)
+
+          # Critical startup ordering fix:
+          # force the local data engine to initialise synchronously before v070 runs.
           p=Path('build-ui/index.html')
-          s=p.read_text()
-          tag='<script src="v070.js" defer></script>'
-          if tag not in s:
-              if '</body>' not in s:
-                  raise SystemExit('Could not locate closing body tag')
-              s=s.replace('</body>', '  '+tag+'\n</body>')
-          p.write_text(s)
+          html=p.read_text()
+          engine='<script src="offline-data.js"></script>'
+          app='<script src="v070.js" defer></script>'
+          block='  '+engine+'\n  '+app+'\n'
+          html=html.replace(app,'')
+          if '</body>' not in html:
+              raise SystemExit('Could not locate closing body tag')
+          html=html.replace('</body>', block+'</body>')
+          p.write_text(html)
           PY
+
           node --check build-ui/offline-data.js
           [ ! -f build-ui/app.js ] || node --check build-ui/app.js
           [ ! -f build-ui/v060.js ] || node --check build-ui/v060.js
           [ ! -f build-ui/v061.js ] || node --check build-ui/v061.js
           node --check build-ui/v070.js
+
+          # Runtime smoke-test the local API before publishing.
+          node - <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const store=new Map();
+          const ctx={window:{},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,String(v))},URL,URLSearchParams,console,setTimeout,clearTimeout,Date,Math,JSON};
+          ctx.window=ctx;
+          vm.createContext(ctx);
+          vm.runInContext(fs.readFileSync('build-ui/offline-data.js','utf8'),ctx);
+          if(!ctx.CrowdOrbitLocalAPI || typeof ctx.CrowdOrbitLocalAPI.api!=='function') throw new Error('CrowdOrbitLocalAPI did not initialise');
+          Promise.resolve(ctx.CrowdOrbitLocalAPI.api('/api/dashboard')).then(d=>{
+            if(!d || typeof d.total==='undefined') throw new Error('Dashboard API smoke test failed');
+            console.log('CrowdOrbitLocalAPI runtime smoke test PASS');
+          });
+          NODE
+
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
           ACTUAL=$(sha256sum "ui-$VERSION.zip" | awk '{print $1}')
