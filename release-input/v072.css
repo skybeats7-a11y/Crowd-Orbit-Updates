@@ -1,0 +1,16 @@
+html[data-remote-ui^="0.7."] body{margin:0!important;overflow:hidden!important;background:#090a10!important;color:#f7f5ef!important}
+html[data-remote-ui^="0.7."] body>*:not(#co70-app):not(script){display:none!important}
+html[data-remote-ui^="0.7."] #co70-app{position:fixed!important;inset:0!important;z-index:2147480000!important;display:block!important;overflow-y:auto!important;overflow-x:hidden!important;min-height:100dvh!important;box-sizing:border-box!important;padding:62px 20px 164px!important;background:radial-gradient(circle at 15% 0%,rgba(111,69,245,.18),transparent 34%),radial-gradient(circle at 90% 8%,rgba(213,168,74,.11),transparent 24%),linear-gradient(180deg,#080910,#0b0c14 55%,#090a10)!important;color:#f7f5ef!important;-webkit-overflow-scrolling:touch}
+html[data-remote-ui^="0.7."] #co70-app *{box-sizing:border-box}
+html[data-remote-ui^="0.7."] #co70-app .co70-wrap{position:relative;z-index:1}
+html[data-remote-ui^="0.7."] #co70-app .co70-top{min-height:58px;margin:0 0 24px!important;padding-right:58px!important;align-items:center!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-brand strong,html[data-remote-ui^="0.7."] #co70-app .co70-headline h1,html[data-remote-ui^="0.7."] #co70-app h2,html[data-remote-ui^="0.7."] #co70-app h3{color:#f7f5ef!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-headline p,html[data-remote-ui^="0.7."] #co70-app .co70-sub,html[data-remote-ui^="0.7."] #co70-app .co70-status{color:#a6a4b4}
+html[data-remote-ui^="0.7."] #co70-app .co70-card{background:linear-gradient(180deg,rgba(24,25,38,.94),rgba(12,13,21,.96))!important;border-color:rgba(255,255,255,.09)!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-nav{bottom:48px!important;z-index:2147483000!important;background:rgba(8,9,15,.96)!important;border-color:rgba(255,255,255,.12)!important;box-shadow:0 18px 60px rgba(0,0,0,.62)!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-pill,html[data-remote-ui^="0.7."] #co70-app .co70-icon{color:#f7f5ef!important;background:rgba(255,255,255,.045)!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-empty{background:rgba(255,255,255,.018)}
+html[data-remote-ui^="0.7."] #co70-app .co70-status.ok{color:#63d89d!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-status.error{color:#ff8585!important}
+@media(max-width:850px){html[data-remote-ui^="0.7."] #co70-app{padding:64px 14px 168px!important}html[data-remote-ui^="0.7."] #co70-app .co70-top{padding-right:54px!important}html[data-remote-ui^="0.7."] #co70-app .co70-nav{bottom:46px!important;width:calc(100% - 24px)!important}}
+@media(max-width:520px){html[data-remote-ui^="0.7."] #co70-app{padding-top:60px!important;padding-bottom:160px!important}html[data-remote-ui^="0.7."] #co70-app .co70-top{padding-right:50px!important}.co70-brand span{font-size:9px!important;letter-spacing:.17em!important}}
