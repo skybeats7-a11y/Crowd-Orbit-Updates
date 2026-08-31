@@ -1,26 +1,36 @@
-name: Validate Crowd Orbit Interface 0.7
+name: Publish Crowd Orbit UI update
 
 on:
   push:
-    branches: [ "interface-0.7.0" ]
+    branches: [ "main" ]
     paths:
       - "release-input/**"
       - ".github/workflows/publish-ui.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Assemble Crowd Orbit Interface 0.7
+      - name: Read release metadata
+        id: meta
+        shell: bash
+        run: |
+          VERSION=$(python -c "import json; print(json.load(open('release-input/latest.json'))['uiVersion'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Assemble Crowd Orbit interface
         shell: bash
         run: |
           set -euo pipefail
+          VERSION='${{ steps.meta.outputs.version }}'
           rm -rf build-ui
           mkdir build-ui
           unzip -q ui-0.6.1.zip -d build-ui
@@ -39,15 +49,41 @@ jobs:
           p.write_text(s)
           PY
           node --check build-ui/offline-data.js
-          node --check build-ui/v060.js
-          node --check build-ui/v061.js
+          [ ! -f build-ui/app.js ] || node --check build-ui/app.js
+          [ ! -f build-ui/v060.js ] || node --check build-ui/v060.js
+          [ ! -f build-ui/v061.js ] || node --check build-ui/v061.js
           node --check build-ui/v070.js
-          (cd build-ui && zip -q -9 -r ../ui-0.7.0-preview.zip .)
-          unzip -t ui-0.7.0-preview.zip
-          sha256sum ui-0.7.0-preview.zip
+          (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
+          unzip -t "ui-$VERSION.zip"
+          ACTUAL=$(sha256sum "ui-$VERSION.zip" | awk '{print $1}')
+          printf '%s  %s\n' "$ACTUAL" "ui-$VERSION.zip" > "ui-$VERSION.sha256"
+          python - <<PY
+          import json
+          meta=json.load(open('release-input/latest.json'))
+          version=meta['uiVersion']
+          out={
+            'uiVersion': version,
+            'minimumShell': meta['minimumShell'],
+            'bundleUrl': f'https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-{version}.zip',
+            'sha256': '$ACTUAL',
+            'notes': meta['notes']
+          }
+          with open('latest.json','w') as f:
+            json.dump(out,f,indent=2)
+            f.write('\n')
+          PY
 
-      - name: Upload preview package
-        uses: actions/upload-artifact@v4
-        with:
-          name: Crowd-Orbit-Interface-0.7.0-preview
-          path: ui-0.7.0-preview.zip
+      - name: Publish verified release
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION='${{ steps.meta.outputs.version }}'
+          git config user.name "Crowd Orbit Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add latest.json "ui-$VERSION.zip" "ui-$VERSION.sha256"
+          if git diff --cached --quiet; then
+            echo "Release already published."
+            exit 0
+          fi
+          git commit -m "Publish verified Crowd Orbit v$VERSION remote release [skip ci]"
+          git push
