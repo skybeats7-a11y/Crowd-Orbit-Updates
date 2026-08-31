@@ -48,16 +48,18 @@ jobs:
               s=s.replace('</body>', '  '+tag+'\n</body>')
           p.write_text(s)
 
-          p=Path('build-ui/app.js')
-          s=p.read_text()
           old="contact_email:$('#person-email').value,website:$('#person-website').value"
           new="contact_email:$('#person-email').value,phone_number:$('#person-phone')?.value||'',website:$('#person-website').value"
-          if new not in s and old in s:
-              s=s.replace(old,new)
-          p.write_text(s)
+          candidates=list(Path('build-ui').rglob('app.js'))
+          if candidates:
+              p=candidates[0]
+              s=p.read_text()
+              if new not in s and old in s:
+                  s=s.replace(old,new)
+              p.write_text(s)
           PY
           node --check build-ui/offline-data.js
-          node --check build-ui/app.js
+          [ ! -f build-ui/app.js ] || node --check build-ui/app.js
           [ ! -f build-ui/v051.js ] || node --check build-ui/v051.js
           node --check build-ui/v060.js
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
