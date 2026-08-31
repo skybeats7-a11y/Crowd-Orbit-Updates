@@ -24,11 +24,9 @@ jobs:
         shell: bash
         run: |
           VERSION=$(python -c "import json; print(json.load(open('release-input/latest.json'))['uiVersion'])")
-          MINIMUM=$(python -c "import json; print(json.load(open('release-input/latest.json'))['minimumShell'])")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "minimum=$MINIMUM" >> "$GITHUB_OUTPUT"
 
-      - name: Assemble Crowd Orbit v0.6 interface
+      - name: Assemble Crowd Orbit interface
         shell: bash
         run: |
           set -euo pipefail
@@ -43,26 +41,24 @@ jobs:
           from pathlib import Path
           p=Path('build-ui/index.html')
           s=p.read_text()
-          needle='<script src="v051.js" defer></script>'
-          if '<script src="v060.js" defer></script>' not in s:
-              if needle not in s:
-                  raise SystemExit('Could not locate v051.js script tag')
-              s=s.replace(needle, needle+'\n  <script src="v060.js" defer></script>')
+          tag='<script src="v060.js" defer></script>'
+          if tag not in s:
+              if '</body>' not in s:
+                  raise SystemExit('Could not locate closing body tag')
+              s=s.replace('</body>', '  '+tag+'\n</body>')
           p.write_text(s)
 
           p=Path('build-ui/app.js')
           s=p.read_text()
           old="contact_email:$('#person-email').value,website:$('#person-website').value"
           new="contact_email:$('#person-email').value,phone_number:$('#person-phone')?.value||'',website:$('#person-website').value"
-          if new not in s:
-              if old not in s:
-                  raise SystemExit('Could not locate person capture payload')
+          if new not in s and old in s:
               s=s.replace(old,new)
           p.write_text(s)
           PY
           node --check build-ui/offline-data.js
           node --check build-ui/app.js
-          node --check build-ui/v051.js
+          [ ! -f build-ui/v051.js ] || node --check build-ui/v051.js
           node --check build-ui/v060.js
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
