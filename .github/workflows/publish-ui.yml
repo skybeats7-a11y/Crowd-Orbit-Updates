@@ -40,6 +40,8 @@ jobs:
           cp release-input/v072.css build-ui/v072.css
           cp release-input/v073.js build-ui/v073.js
           cp release-input/v073.css build-ui/v073.css
+          cp release-input/v074.js build-ui/v074.js
+          cp release-input/v074.css build-ui/v074.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -52,18 +54,24 @@ jobs:
 
           p=Path('build-ui/index.html')
           html=p.read_text()
-          engine='<script src="offline-data.js"></script>'
-          app='<script src="v070.js" defer></script>'
-          fix='<script src="v072.js" defer></script>'
-          refine='<script src="v073.js" defer></script>'
-          cssfix='<link rel="stylesheet" href="v072.css">'
-          cssrefine='<link rel="stylesheet" href="v073.css">'
-          for tag in (engine,app,fix,refine,cssfix,cssrefine):
+          scripts=[
+            '<script src="offline-data.js"></script>',
+            '<script src="v070.js" defer></script>',
+            '<script src="v072.js" defer></script>',
+            '<script src="v073.js" defer></script>',
+            '<script src="v074.js" defer></script>'
+          ]
+          styles=[
+            '<link rel="stylesheet" href="v072.css">',
+            '<link rel="stylesheet" href="v073.css">',
+            '<link rel="stylesheet" href="v074.css">'
+          ]
+          for tag in scripts+styles:
               html=html.replace(tag,'')
           if '</head>' not in html or '</body>' not in html:
               raise SystemExit('Could not locate interface document anchors')
-          html=html.replace('</head>', '  '+cssfix+'\n  '+cssrefine+'\n</head>')
-          html=html.replace('</body>', '  '+engine+'\n  '+app+'\n  '+fix+'\n  '+refine+'\n</body>')
+          html=html.replace('</head>', '  '+'\n  '.join(styles)+'\n</head>')
+          html=html.replace('</body>', '  '+'\n  '.join(scripts)+'\n</body>')
           p.write_text(html)
           PY
 
@@ -74,6 +82,7 @@ jobs:
           node --check build-ui/v070.js
           node --check build-ui/v072.js
           node --check build-ui/v073.js
+          node --check build-ui/v074.js
 
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm');
@@ -89,12 +98,11 @@ jobs:
           });
           NODE
 
-          grep -q 'data-remote-ui^="0.7."' build-ui/v072.css
-          grep -q 'co73-empty-network' build-ui/v073.css
-          grep -q 'v072.css' build-ui/index.html
-          grep -q 'v072.js' build-ui/index.html
-          grep -q 'v073.css' build-ui/index.html
-          grep -q 'v073.js' build-ui/index.html
+          grep -q 'co74-nav-hidden' build-ui/v074.js
+          grep -q 'co74-zones' build-ui/v074.js
+          grep -q 'co74-zone.outer' build-ui/v074.css
+          grep -q 'v074.css' build-ui/index.html
+          grep -q 'v074.js' build-ui/index.html
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
