@@ -2,6 +2,6 @@
   "uiVersion": "0.6.0",
   "minimumShell": "0.5.0",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.6.0.zip",
-  "sha256": "efc7e38626a26c07eb0ee2772f649872188210b5c0840c989b80092de35bd854",
+  "sha256": "c2e9343eda6243c659161086c822cabc87e4b0128375780ea435cf5ce5c026b4",
   "notes": "Real batch collection: smart deduplication, local email and phone extraction, role detection, Contact Ready / Priority sorting and a simpler Orbit pipeline"
 }
