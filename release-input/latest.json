@@ -1,0 +1,5 @@
+{
+  "uiVersion": "0.6.0",
+  "minimumShell": "0.5.0",
+  "notes": "Real batch collection: smart deduplication, local email and phone extraction, role detection, Contact Ready / Priority sorting and a simpler Orbit pipeline"
+}
