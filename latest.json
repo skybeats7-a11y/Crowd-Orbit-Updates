@@ -2,6 +2,6 @@
   "uiVersion": "0.7.2",
   "minimumShell": "0.5.0",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.2.zip",
-  "sha256": "6300b653e179e6af9a099492dad8b259326d9a9479be720f69064bb7284b8987",
+  "sha256": "50313bb8aa457fdb62b9ca8655f45d15b89d00d026878bafd4485a5fc59cd417",
   "notes": "Presentation and stability correction: isolate the Concept 2 interface as a true full-screen app, remove visible legacy 0.5.1 UI and duplicate navigation, fix 0.7.x dark-theme scoping, improve Android safe-area spacing, and make Update Centre status resolve visibly."
 }
