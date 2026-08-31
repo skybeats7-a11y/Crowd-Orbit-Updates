@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.6.0",
+  "uiVersion": "0.6.1",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.6.0.zip",
-  "sha256": "c2e9343eda6243c659161086c822cabc87e4b0128375780ea435cf5ce5c026b4",
-  "notes": "Real batch collection: smart deduplication, local email and phone extraction, role detection, Contact Ready / Priority sorting and a simpler Orbit pipeline"
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.6.1.zip",
+  "sha256": "26300698f7be89ab88a59025d2bb798810de9ce1dedf672ceabd125ee7a55a40",
+  "notes": "Orbit Intelligence redesign: dark purple and gold interface, live orbit network visual, smarter match surface, persistent Update Centre status and local Backup Vault with restore"
 }
