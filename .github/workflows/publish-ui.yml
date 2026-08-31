@@ -37,15 +37,20 @@ jobs:
           cat release-input/offline-data.js.part* > build-ui/offline-data.js
           cp release-input/v060.js build-ui/v060.js
           cp release-input/v060.css build-ui/v060.css
+          if [ -f release-input/v061.js ]; then cp release-input/v061.js build-ui/v061.js; fi
+          if [ -f release-input/v061.css ]; then cp release-input/v061.css build-ui/v061.css; fi
           python - <<'PY'
           from pathlib import Path
           p=Path('build-ui/index.html')
           s=p.read_text()
-          tag='<script src="v060.js" defer></script>'
-          if tag not in s:
-              if '</body>' not in s:
-                  raise SystemExit('Could not locate closing body tag')
-              s=s.replace('</body>', '  '+tag+'\n</body>')
+          tags=['<script src="v060.js" defer></script>']
+          if Path('build-ui/v061.js').is_file():
+              tags.append('<script src="v061.js" defer></script>')
+          for tag in tags:
+              if tag not in s:
+                  if '</body>' not in s:
+                      raise SystemExit('Could not locate closing body tag')
+                  s=s.replace('</body>', '  '+tag+'\n</body>')
           p.write_text(s)
 
           old="contact_email:$('#person-email').value,website:$('#person-website').value"
@@ -62,6 +67,7 @@ jobs:
           [ ! -f build-ui/app.js ] || node --check build-ui/app.js
           [ ! -f build-ui/v051.js ] || node --check build-ui/v051.js
           node --check build-ui/v060.js
+          [ ! -f build-ui/v061.js ] || node --check build-ui/v061.js
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
           ACTUAL=$(sha256sum "ui-$VERSION.zip" | awk '{print $1}')
