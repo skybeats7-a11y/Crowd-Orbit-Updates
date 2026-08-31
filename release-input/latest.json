@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.6.0",
+  "uiVersion": "0.6.1",
   "minimumShell": "0.5.0",
-  "notes": "Real batch collection: smart deduplication, local email and phone extraction, role detection, Contact Ready / Priority sorting and a simpler Orbit pipeline"
+  "notes": "Orbit Intelligence redesign: dark purple and gold interface, live orbit network visual, smarter match surface, persistent Update Centre status and local Backup Vault with restore"
 }
