@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.5.1",
+  "uiVersion": "0.6.0",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.5.1.zip",
-  "sha256": "619ae1ee8baa67f2c59614e06f662e6caabd33ea2b8988fb651abbeca3e3f890",
-  "notes": "Lighter creative-networking design, automatic social profile capture, richer People profiles and Orbit IQ relationship intelligence"
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.6.0.zip",
+  "sha256": "12ef8647582ab4608b49bbc9e9c00a4dbc85ba1030c988c5b305f1f8dfea47c4",
+  "notes": "Real batch collection: smart deduplication, local email and phone extraction, role detection, Contact Ready / Priority sorting and a simpler Orbit pipeline"
 }
