@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.7.2",
+  "uiVersion": "0.7.3",
   "minimumShell": "0.5.0",
-  "notes": "Presentation and stability correction: isolate the Concept 2 interface as a true full-screen app, remove visible legacy 0.5.1 UI and duplicate navigation, fix 0.7.x dark-theme scoping, improve Android safe-area spacing, and make Update Centre status resolve visibly."
+  "notes": "Tablet and Orbit refinement: compress the empty relationship map, surface useful intelligence sooner, improve tablet portrait density, add clearer Orbit zones and YOU centre labelling, tighten header/navigation spacing, and preserve the full-screen Concept 2 interface and working 0.7.2 stability fixes."
 }
