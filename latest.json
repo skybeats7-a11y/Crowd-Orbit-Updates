@@ -2,6 +2,6 @@
   "uiVersion": "0.7.1",
   "minimumShell": "0.5.0",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.1.zip",
-  "sha256": "9b9626f7ffecfa991be01fb82ff8a4d9782bec7646c596af40e96ae0a9e55b3c",
+  "sha256": "d59e2b2ff20cb8b658253e6b1fc3149f800fff15cda493bb579150658327503d",
   "notes": "Hotfix for Interface 0.7.0 startup crash: force local Crowd Orbit data engine to initialise before the Concept 2 interface, add runtime API smoke testing, and preserve the 0.7.0 redesign and data."
 }
