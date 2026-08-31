@@ -38,6 +38,8 @@ jobs:
           cp release-input/v070.css build-ui/v070.css
           cp release-input/v072.js build-ui/v072.js
           cp release-input/v072.css build-ui/v072.css
+          cp release-input/v073.js build-ui/v073.js
+          cp release-input/v073.css build-ui/v073.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -53,13 +55,15 @@ jobs:
           engine='<script src="offline-data.js"></script>'
           app='<script src="v070.js" defer></script>'
           fix='<script src="v072.js" defer></script>'
-          css='<link rel="stylesheet" href="v072.css">'
-          for tag in (engine,app,fix,css):
+          refine='<script src="v073.js" defer></script>'
+          cssfix='<link rel="stylesheet" href="v072.css">'
+          cssrefine='<link rel="stylesheet" href="v073.css">'
+          for tag in (engine,app,fix,refine,cssfix,cssrefine):
               html=html.replace(tag,'')
           if '</head>' not in html or '</body>' not in html:
               raise SystemExit('Could not locate interface document anchors')
-          html=html.replace('</head>', '  '+css+'\n</head>')
-          html=html.replace('</body>', '  '+engine+'\n  '+app+'\n  '+fix+'\n</body>')
+          html=html.replace('</head>', '  '+cssfix+'\n  '+cssrefine+'\n</head>')
+          html=html.replace('</body>', '  '+engine+'\n  '+app+'\n  '+fix+'\n  '+refine+'\n</body>')
           p.write_text(html)
           PY
 
@@ -69,6 +73,7 @@ jobs:
           [ ! -f build-ui/v061.js ] || node --check build-ui/v061.js
           node --check build-ui/v070.js
           node --check build-ui/v072.js
+          node --check build-ui/v073.js
 
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm');
@@ -85,9 +90,11 @@ jobs:
           NODE
 
           grep -q 'data-remote-ui^="0.7."' build-ui/v072.css
-          grep -q 'body>\*:not(#co70-app)' build-ui/v072.css
+          grep -q 'co73-empty-network' build-ui/v073.css
           grep -q 'v072.css' build-ui/index.html
           grep -q 'v072.js' build-ui/index.html
+          grep -q 'v073.css' build-ui/index.html
+          grep -q 'v073.js' build-ui/index.html
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
