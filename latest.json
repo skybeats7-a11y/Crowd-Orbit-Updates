@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.6.1",
+  "uiVersion": "0.7.0",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.6.1.zip",
-  "sha256": "26300698f7be89ab88a59025d2bb798810de9ce1dedf672ceabd125ee7a55a40",
-  "notes": "Orbit Intelligence redesign: dark purple and gold interface, live orbit network visual, smarter match surface, persistent Update Centre status and local Backup Vault with restore"
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.0.zip",
+  "sha256": "2ccc647712618490dd5815ad93398b58edd79c764037478f097dfac980ae1e0c",
+  "notes": "Concept 2 rebuild: new Crowd Orbit identity, full dark premium app shell, live relationship orbit, Radar matching, People intelligence, local batch Collect, campaign ranking, persistent Update Centre and Backup Vault"
 }
