@@ -2,6 +2,6 @@
   "uiVersion": "0.7.3",
   "minimumShell": "0.5.0",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.3.zip",
-  "sha256": "b5505b9dd09701f689676c84585a6835d3be1bd7fbc72b8234bbb736f81fffc7",
+  "sha256": "3d4f7421cc08f7acfe598424fa2c59968e977c178329011afeca1d35953ae83f",
   "notes": "Tablet and Orbit refinement: compress the empty relationship map, surface useful intelligence sooner, improve tablet portrait density, add clearer Orbit zones and YOU centre labelling, tighten header/navigation spacing, and preserve the full-screen Concept 2 interface and working 0.7.2 stability fixes."
 }
