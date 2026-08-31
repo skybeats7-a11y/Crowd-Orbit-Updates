@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.7.0",
+  "uiVersion": "0.7.1",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.0.zip",
-  "sha256": "2ccc647712618490dd5815ad93398b58edd79c764037478f097dfac980ae1e0c",
-  "notes": "Concept 2 rebuild: new Crowd Orbit identity, full dark premium app shell, live relationship orbit, Radar matching, People intelligence, local batch Collect, campaign ranking, persistent Update Centre and Backup Vault"
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.1.zip",
+  "sha256": "9b9626f7ffecfa991be01fb82ff8a4d9782bec7646c596af40e96ae0a9e55b3c",
+  "notes": "Hotfix for Interface 0.7.0 startup crash: force local Crowd Orbit data engine to initialise before the Concept 2 interface, add runtime API smoke testing, and preserve the 0.7.0 redesign and data."
 }
