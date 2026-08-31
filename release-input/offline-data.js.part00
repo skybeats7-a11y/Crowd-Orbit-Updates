@@ -1,0 +1,94 @@
+'use strict';
+(() => {
+  const KEY='crowd_orbit_offline_v1';
+  const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||0));
+  const now=()=>new Date().toISOString();
+  const blank=()=>({version:3,nextPersonId:1,nextSeedId:1,nextCampaignId:1,nextInteractionId:1,people:[],seeds:[],campaigns:[],campaignPeople:[],interactions:[],goals:['Find Clients','Find Collaborators','Build Industry Relationships']});
+  const arr=v=>Array.isArray(v)?v:[];
+  const text=v=>String(v??'').trim();
+  const lower=v=>text(v).toLowerCase();
+
+  function load(){
+    try{
+      const raw=localStorage.getItem(KEY); if(!raw)return blank();
+      const d=JSON.parse(raw); if(!d)return blank();
+      const out={...blank(),...d};
+      out.version=3;out.people=arr(d.people);out.seeds=arr(d.seeds);out.campaigns=arr(d.campaigns);out.campaignPeople=arr(d.campaignPeople);out.interactions=arr(d.interactions);out.goals=arr(d.goals).length?arr(d.goals):blank().goals;
+      out.people=out.people.map(p=>({...p,phone_number:text(p.phone_number||p.phone||''),analysis_status:p.analysis_status||'Imported',analysis_confidence:Number(p.analysis_confidence||p.classification_confidence||0),last_analysed_at:p.last_analysed_at||''}));
+      return out;
+    }catch{return blank()}
+  }
+  let db=load(); save();
+  function save(){localStorage.setItem(KEY,JSON.stringify(db));}
+  function body(opts){try{return opts&&opts.body?JSON.parse(opts.body):{}}catch{return {}}}
+  function daysSince(v){if(!v)return 999;const n=(Date.now()-new Date(v).getTime())/86400000;return Number.isFinite(n)?Math.max(0,Math.floor(n)):999}
+  function cleanEmail(v){v=lower(v);return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)?v:''}
+  function cleanPhone(v){
+    let s=text(v);if(!s)return'';s=s.replace(/[^\d+() .-]/g,'').trim();
+    const digits=s.replace(/\D/g,'');if(digits.length<7||digits.length>16)return'';
+    if(s.startsWith('00'))s='+'+s.slice(2);return s.replace(/\s+/g,' ').slice(0,40);
+  }
+  function humanHandle(h){return text(h).replace(/^@/,'').replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()).trim()||'Captured profile'}
+  function social(url){
+    try{
+      const u=new URL(url),host=u.hostname.toLowerCase(),parts=u.pathname.split('/').filter(Boolean);let platform='',handle='';
+      if(host.includes('instagram.com')){platform='Instagram';handle=parts[0]||''}
+      else if(host.includes('tiktok.com')){platform='TikTok';handle=(parts.find(x=>x.startsWith('@'))||parts[0]||'').replace(/^@/,'')}
+      else if(host==='x.com'||host.includes('twitter.com')){platform='X';handle=parts[0]||''}
+      else if(host.includes('youtube.com')){platform='YouTube';let first=parts[0]||'';if(first.startsWith('@'))handle=first.slice(1);else if(['channel','c','user'].includes(first.toLowerCase()))handle=parts[1]||''}
+      else if(host.includes('soundcloud.com')){platform='SoundCloud';handle=parts[0]||''}
+      else if(host.includes('spotify.com')){platform='Spotify';handle=parts.at(-1)||''}
+      else if(host.includes('linkedin.com')){platform='LinkedIn';handle=parts.at(-1)||''}
+      else return null;
+      return {platform,handle:handle?'@'+handle.replace(/^@/,''):'',url:u.href};
+    }catch{return null}
+  }
+  const ROLE_RULES=[
+    ['A&R',/\b(a\s*&\s*r|artists?\s+and\s+repertoire)\b/i],
+    ['Engineer',/\b(audio engineer|sound engineer|mix(?:ing)? engineer|mastering engineer|mix(?:ing)?\s*&?\s*master(?:ing)?)\b/i],
+    ['Producer',/\b(music producer|record producer|beatmaker|beat maker|producer|beats? by)\b/i],
+    ['Songwriter',/\b(songwriter|song writer|composer|lyricist)\b/i],
+    ['Manager',/\b(artist manager|music manager|management|manager)\b/i],
+    ['DJ',/\b(dj|disc jockey)\b/i],
+    ['Label',/\b(record label|indie label|label owner|label)\b/i],
+    ['Media',/\b(journalist|editor|radio host|presenter|podcast host|media|blogger|press)\b/i],
+    ['Artist',/\b(artist|rapper|singer|vocalist|musician|recording artist|mc\b)\b/i]
+  ];
+  function inferRole(s){for(const [role,re] of ROLE_RULES){if(re.test(s))return role}return'Unknown'}
+  function inferLocation(s){const places=['London','Birmingham','Manchester','Leeds','Liverpool','Bristol','Glasgow','Cardiff','New York','Los Angeles','Atlanta','Toronto','Paris','Berlin'];return places.find(p=>new RegExp(`\\b${p.replace(/ /g,'\\s+')}\\b`,'i').test(s))||''}
+  function inferFollowers(s){
+    const m=String(s).match(/(?:followers?|fans?|audience)\s*[:\-]?\s*([\d,.]+)\s*([km]?)/i)||String(s).match(/([\d,.]+)\s*([km]?)\s*(?:followers?|fans?)/i);if(!m)return 0;
+    let n=Number(String(m[1]).replace(/,/g,''))||0;const suffix=lower(m[2]);if(suffix==='k')n*=1000;if(suffix==='m')n*=1000000;return Math.round(n);
+  }
+  function inferEmail(s){const m=String(s).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);return cleanEmail(m?.[0]||'')}
+  function inferPhone(s){
+    const candidates=String(s).match(/(?:\+|00)?\d[\d\s().-]{6,}\d/g)||[];
+    for(const c of candidates){const p=cleanPhone(c);if(p)return p}return'';
+  }
+  function inferUrl(s){return (String(s).match(/https?:\/\/[^\s,;]+/i)||[])[0]||''}
+  function inferHandle(s){const direct=(String(s).match(/(^|[\s,(])@([A-Za-z0-9._-]{2,})/)||[])[2];if(direct)return'@'+direct;const u=inferUrl(s),p=social(u);return p?.handle||''}
+  function inferName(s,handle,url){
+    const first=String(s).split(/[|,;\t]/)[0].trim();
+    if(first&&!/^https?:\/\//i.test(first)&&!first.startsWith('@')&&!/\b(email|phone|followers?)\b/i.test(first)&&first.length<=90)return first;
+    if(handle)return humanHandle(handle);
+    if(url){const p=social(url);if(p?.handle)return humanHandle(p.handle);try{return humanHandle(new URL(url).pathname.split('/').filter(Boolean).at(-1)||'Captured profile')}catch{}}
+    return'Captured profile';
+  }
+  function analyseTextLine(line){
+    const raw=text(line);if(!raw)return null;const url=inferUrl(raw),sp=social(url),handle=inferHandle(raw),email=inferEmail(raw),phone=inferPhone(raw),role=inferRole(raw),loc=inferLocation(raw),followers=inferFollowers(raw);
+    const name=inferName(raw,handle,url);let confidence=20;if(handle)confidence+=18;if(url)confidence+=12;if(role!=='Unknown')confidence+=20;if(email)confidence+=15;if(phone)confidence+=15;if(loc)confidence+=5;if(followers)confidence+=5;
+    const status=(email||phone||url)?'Contact Ready':'Missing Details';
+    return {name,handle,role,location:loc,followers,relationship:'Discovery',contact_email:email,phone_number:phone,source_url:url,platforms:sp?.platform?[sp.platform]:[],notes:raw.slice(0,3000),analysis_status:status,analysis_confidence:clamp(confidence,0,100),last_analysed_at:now(),classification_confidence:role==='Unknown'?0:clamp(confidence,0,100)};
+  }
+  function mergeField(oldVal,newVal){if(Array.isArray(newVal))return newVal.length?Array.from(new Set([...(Array.isArray(oldVal)?oldVal:[]),...newVal])):oldVal;if(newVal===undefined||newVal===null||newVal==='')return oldVal;return newVal}
+  function personView(p){
+    const ints=db.interactions.filter(i=>i.person_id===p.id).sort((a,b)=>String(b.at).localeCompare(String(a.at)));const last=ints[0]?.at||p.last_interaction||'';const trend=daysSince(last)<=7?'Getting closer':daysSince(last)>=30?'Cooling':'Stable';
+    const hasContact=Boolean(p.contact_email||p.phone_number||p.website||p.source_url);const computed=opportunityScore(p);let analysisStatus=p.analysis_status||'Imported';if(computed>=78&&hasContact)analysisStatus='Priority';else if(hasContact&&analysisStatus!=='Priority')analysisStatus='Contact Ready';else if(!hasContact&&analysisStatus==='Imported')analysisStatus='Missing Details';
+    return {...p,secondary_roles:arr(p.secondary_roles),platforms:arr(p.platforms),source_accounts:arr(p.source_accounts),has_contact:hasContact,last_interaction:last,relationship_trend:trend,interaction_count:ints.length,phone_number:text(p.phone_number),analysis_status:analysisStatus,opportunity_score:computed};
+  }
+  function opportunityScore(p){
+    let s=Number(p.network_score||50),role=text(p.role),followers=Number(p.followers||0),contact=Boolean(p.contact_email||p.phone_number||p.website||p.source_url);if(role&&role!=='Unknown')s+=8;if(contact)s+=10;if(p.contact_email)s+=4;if(p.phone_number)s+=4;if(p.relationship==='Warm')s+=12;else if(p.relationship==='2nd degree')s+=6;s+=Math.min(8,Number(p.source_overlap||0)*1.5);s+=Math.min(8,Math.log10(Math.max(1,followers))*1.8);s+=Math.min(6,Number(p.analysis_confidence||0)/20);return Math.round(clamp(s,0,100));
+  }
+  function score(p,goal='general',priority='best_overall'){
+    let s=opportunityScore(p),role=lower(p.role),rel=p.relationship,followers=Number(p.followers||0),contact=Boolean(p.contact_email||p.phone_number||p.website||p.source_url);
+    const boosts={recruit_artists:role==='artist'?18:role==='manager'?7:0,studio_services:['artist','producer','manager'].includes(role)?14:role==='engineer'?5:0,release_promo:['dj','manager','media'].includes(role)?14:role==='artist'?7:0,relationships:['manager','producer','engineer','dj','a&r','label'].includes(role)?12:6,collabora
