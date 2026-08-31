@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.7.2",
+  "uiVersion": "0.7.3",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.2.zip",
-  "sha256": "50313bb8aa457fdb62b9ca8655f45d15b89d00d026878bafd4485a5fc59cd417",
-  "notes": "Presentation and stability correction: isolate the Concept 2 interface as a true full-screen app, remove visible legacy 0.5.1 UI and duplicate navigation, fix 0.7.x dark-theme scoping, improve Android safe-area spacing, and make Update Centre status resolve visibly."
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.3.zip",
+  "sha256": "9f8b0cd1bb9285e29aebd98134c1aa76fa49aff53a57b34e9bc4889f4a8b3d9c",
+  "notes": "Tablet and Orbit refinement: compress the empty relationship map, surface useful intelligence sooner, improve tablet portrait density, add clearer Orbit zones and YOU centre labelling, tighten header/navigation spacing, and preserve the full-screen Concept 2 interface and working 0.7.2 stability fixes."
 }
