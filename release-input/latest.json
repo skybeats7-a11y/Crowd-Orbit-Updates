@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.7.1",
+  "uiVersion": "0.7.2",
   "minimumShell": "0.5.0",
-  "notes": "Hotfix for Interface 0.7.0 startup crash: force local Crowd Orbit data engine to initialise before the Concept 2 interface, add runtime API smoke testing, and preserve the 0.7.0 redesign and data."
+  "notes": "Presentation and stability correction: isolate the Concept 2 interface as a true full-screen app, remove visible legacy 0.5.1 UI and duplicate navigation, fix 0.7.x dark-theme scoping, improve Android safe-area spacing, and make Update Centre status resolve visibly."
 }
