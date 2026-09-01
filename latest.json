@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.7.4",
+  "uiVersion": "0.7.5",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.4.zip",
-  "sha256": "801c8aedede3992d4c55cdc54fde1c07132ffebd960ad2e22cd5dcce38564db7",
-  "notes": "Tablet navigation and Orbit-zone refinement: auto-hide the tablet bottom navigation after inactivity with bottom-edge reveal, keep phone navigation persistent, and replace simple ring labels with real Inner Orbit, Active Signal and Outer Orbit zone bands that visually match relationship strength and opportunity placement."
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.5.zip",
+  "sha256": "31b318ce25aaf19a1fa76a3bc6ac9f65b0d6e0c65adebd9080491f6396680c61",
+  "notes": "Correct tablet navigation behaviour and Orbit spacing: keep Crowd Orbit's own bottom navigation permanently visible, remove the temporary app-nav auto-hide sensor, preserve the real Concept 2 Orbit zones, and spread people across wider relationship/opportunity bands so the map is less clumped. Android system navigation full-screen is reserved for Engine 5.2."
 }
