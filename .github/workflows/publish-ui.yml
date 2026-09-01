@@ -44,6 +44,9 @@ jobs:
           cp release-input/v074.css build-ui/v074.css
           cp release-input/v075.js build-ui/v075.js
           cp release-input/v075.css build-ui/v075.css
+          cp release-input/v080-data.js build-ui/v080-data.js
+          cp release-input/v080-ui.js build-ui/v080-ui.js
+          cp release-input/v080.css build-ui/v080.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -58,17 +61,20 @@ jobs:
           html=p.read_text()
           scripts=[
             '<script src="offline-data.js"></script>',
+            '<script src="v080-data.js"></script>',
             '<script src="v070.js" defer></script>',
             '<script src="v072.js" defer></script>',
             '<script src="v073.js" defer></script>',
             '<script src="v074.js" defer></script>',
-            '<script src="v075.js" defer></script>'
+            '<script src="v075.js" defer></script>',
+            '<script src="v080-ui.js" defer></script>'
           ]
           styles=[
             '<link rel="stylesheet" href="v072.css">',
             '<link rel="stylesheet" href="v073.css">',
             '<link rel="stylesheet" href="v074.css">',
-            '<link rel="stylesheet" href="v075.css">'
+            '<link rel="stylesheet" href="v075.css">',
+            '<link rel="stylesheet" href="v080.css">'
           ]
           for tag in scripts+styles:
               html=html.replace(tag,'')
@@ -80,15 +86,15 @@ jobs:
           PY
 
           node --check build-ui/offline-data.js
-          [ ! -f build-ui/app.js ] || node --check build-ui/app.js
-          [ ! -f build-ui/v060.js ] || node --check build-ui/v060.js
-          [ ! -f build-ui/v061.js ] || node --check build-ui/v061.js
+          node --check build-ui/v080-data.js
           node --check build-ui/v070.js
           node --check build-ui/v072.js
           node --check build-ui/v073.js
           node --check build-ui/v074.js
           node --check build-ui/v075.js
+          node --check build-ui/v080-ui.js
 
+          # Runtime checks: base engine, strict validation, no fake default score.
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm');
           const store=new Map();
@@ -96,19 +102,29 @@ jobs:
           ctx.window=ctx;
           vm.createContext(ctx);
           vm.runInContext(fs.readFileSync('build-ui/offline-data.js','utf8'),ctx);
+          vm.runInContext(fs.readFileSync('build-ui/v080-data.js','utf8'),ctx);
           if(!ctx.CrowdOrbitLocalAPI || typeof ctx.CrowdOrbitLocalAPI.api!=='function') throw new Error('CrowdOrbitLocalAPI did not initialise');
-          Promise.resolve(ctx.CrowdOrbitLocalAPI.api('/api/dashboard')).then(d=>{
-            if(!d || typeof d.total==='undefined') throw new Error('Dashboard API smoke test failed');
-            console.log('CrowdOrbitLocalAPI runtime smoke test PASS');
-          });
+          (async()=>{
+            let rejected=false;
+            try{await ctx.CrowdOrbitLocalAPI.api('/api/analyse',{method:'POST',body:JSON.stringify({text:'random nonsense banana 123'})});}catch(e){rejected=true}
+            if(!rejected) throw new Error('Random text was incorrectly accepted');
+            const added=await ctx.CrowdOrbitLocalAPI.api('/api/analyse',{method:'POST',body:JSON.stringify({text:'Jade Stone, Artist, London, jade@example.com'})});
+            if(!added.people || added.people.length!==1) throw new Error('Structured person was not accepted');
+            const p=added.people[0];
+            if(p.opportunity_score===null) throw new Error('Evidence-backed person was not scored');
+            const weak=await ctx.CrowdOrbitLocalAPI.api('/api/people',{method:'POST',body:JSON.stringify({name:'Actual Person',role:'Artist'})});
+            if(weak.person.opportunity_score!==null) throw new Error('Sparse person received a fake score');
+            console.log('Crowd Orbit 0.8 evidence scoring PASS');
+          })().catch(e=>{console.error(e);process.exit(1)});
           NODE
 
-          grep -q 'co74-zones' build-ui/v074.js
-          grep -q 'keepAppNavVisible' build-ui/v075.js
-          grep -q 'spreadOrbitNodes' build-ui/v075.js
-          grep -q 'co74-nav-hidden' build-ui/v075.css
-          grep -q 'v075.css' build-ui/index.html
-          grep -q 'v075.js' build-ui/index.html
+          grep -q 'co80-zones' build-ui/v080-ui.js
+          grep -q 'PERSON INTELLIGENCE' build-ui/v080-ui.js
+          grep -q 'Needs evidence' build-ui/v080-data.js
+          grep -q 'person-shaped orbit node' build-ui/crowd-orbit-mark.svg
+          grep -q 'v080-data.js' build-ui/index.html
+          grep -q 'v080-ui.js' build-ui/index.html
+          grep -q 'v080.css' build-ui/index.html
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
