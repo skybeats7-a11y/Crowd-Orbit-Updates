@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.9.1",
+  "uiVersion": "0.10.0",
   "minimumShell": "0.5.0",
-  "notes": "Hotfix: show only the current dark Crowd Orbit interface, suppress the legacy cream shell and duplicate navigation, keep the 0.9 visual reset active across point releases, and preserve all 0.8 evidence-safe scoring, profiles, relationship zones, remote update and backup behaviour."
+  "notes": "Functional Beta: evidence-gated Signal Score and unscored dashes, Action Centre semantics, CSV/TXT/JSON crowd import, expanded Radar filtering, campaign contact queues with workflow statuses, and preserved 0.9 visual design, profiles, backup and remote updating."
 }

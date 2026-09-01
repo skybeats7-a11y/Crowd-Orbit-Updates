@@ -137,6 +137,11 @@
     if(path==='/api/discover'&&method==='POST'){
       const r=await base.api(url,opts);const people=(r.people||[]).map(view).map(p=>({...p,match_score:p.opportunity_score}));return {...r,people:ranked(people)};
     }
+    const queueMatch=path.match(/^\/api\/campaigns\/(\d+)\/people$/);
+    if(queueMatch&&method==='GET'){
+      const id=Number(queueMatch[1]),db=rawDb(),people=await allPeople(),byId=new Map(people.map(p=>[Number(p.id),p]));
+      return {queue:(db.campaignPeople||[]).filter(x=>Number(x.campaign_id)===id).map(x=>({...x,person:byId.get(Number(x.person_id))})).filter(x=>x.person).sort((a,b)=>Number(b.score||-1)-Number(a.score||-1))};
+    }
     if(/^\/api\/campaigns\/\d+\/recommend$/.test(path)&&method==='POST'){
       const r=await base.api(url,opts);const people=(r.people||[]).map(view).map(p=>({...p,campaign_score:p.opportunity_score,reason:p.opportunity_score===null?'Needs more evidence before Crowd Orbit can recommend this person.':p.score_reasons.join(', ')+'.'}));return {...r,people:ranked(people)};
     }

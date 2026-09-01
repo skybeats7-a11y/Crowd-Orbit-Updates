@@ -50,6 +50,8 @@ jobs:
           cp release-input/v090.js build-ui/v090.js
           cp release-input/v090.css build-ui/v090.css
           cp release-input/v091.css build-ui/v091.css
+          cp release-input/v100.js build-ui/v100.js
+          cp release-input/v100.css build-ui/v100.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -72,6 +74,7 @@ jobs:
             '<script src="v075.js" defer></script>',
             '<script src="v080-ui.js" defer></script>',
             '<script src="v090.js" defer></script>'
+            ,'<script src="v100.js" defer></script>'
           ]
           styles=[
             '<link rel="stylesheet" href="v072.css">',
@@ -81,6 +84,7 @@ jobs:
             '<link rel="stylesheet" href="v080.css">',
             '<link rel="stylesheet" href="v090.css">',
             '<link rel="stylesheet" href="v091.css">'
+            ,'<link rel="stylesheet" href="v100.css">'
           ]
           for tag in scripts+styles:
               html=html.replace(tag,'')
@@ -100,6 +104,7 @@ jobs:
           node --check build-ui/v075.js
           node --check build-ui/v080-ui.js
           node --check build-ui/v090.js
+          node --check build-ui/v100.js
 
           # Runtime checks: keep evidence rules intact through the visual hotfix.
           node - <<'NODE'
@@ -121,7 +126,7 @@ jobs:
             if(p.opportunity_score===null) throw new Error('Evidence-backed person was not scored');
             const weak=await ctx.CrowdOrbitLocalAPI.api('/api/people',{method:'POST',body:JSON.stringify({name:'Actual Person',role:'Artist'})});
             if(weak.person.opportunity_score!==null) throw new Error('Sparse person received a fake score');
-            console.log('Crowd Orbit 0.9.1 evidence scoring PASS');
+            console.log('Crowd Orbit 0.10.0 evidence scoring PASS');
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
 
@@ -135,6 +140,12 @@ jobs:
           grep -q 'v090.js' build-ui/index.html
           grep -q 'v090.css' build-ui/index.html
           grep -q 'v091.css' build-ui/index.html
+          grep -q 'Import CSV / TXT / JSON' build-ui/v100.js
+          grep -q 'CONTACT QUEUE' build-ui/v100.js
+          grep -q 'Building ·' build-ui/v100.js
+          grep -q 'campaigns\\/\\(\\d+\\)\\/people' build-ui/v080-data.js
+          grep -q 'v100.js' build-ui/index.html
+          grep -q 'v100.css' build-ui/index.html
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
