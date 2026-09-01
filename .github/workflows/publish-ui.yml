@@ -143,7 +143,7 @@ jobs:
           grep -q 'Import CSV / TXT / JSON' build-ui/v100.js
           grep -q 'CONTACT QUEUE' build-ui/v100.js
           grep -q 'Building ·' build-ui/v100.js
-          grep -q 'campaigns\\/\\(\\d+\\)\\/people' build-ui/v080-data.js
+          grep -q 'queueMatch' build-ui/v080-data.js
           grep -q 'v100.js' build-ui/index.html
           grep -q 'v100.css' build-ui/index.html
 
