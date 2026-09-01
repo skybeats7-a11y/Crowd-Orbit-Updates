@@ -1,8 +1,12 @@
 'use strict';
 (() => {
   const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-  const UI='0.9.0';
-  document.documentElement.dataset.remoteUi=UI;
+  // v070 sets the published release version before this visual layer runs.
+  // Keep that for user-facing versioning, while pinning the visual-theme selector
+  // to 0.9.0 so all 0.9.x point releases inherit the same locked design system.
+  const UI=document.documentElement.dataset.remoteUi||'0.9.0';
+  document.documentElement.dataset.releaseUi=UI;
+  document.documentElement.dataset.remoteUi='0.9.0';
 
   function engine(){try{return String(window.CrowdOrbitNative?.getShellVersion?.()||'0.5.1').replace(/^0\./,'')}catch{return'5.1'}}
 
@@ -57,7 +61,7 @@
   function enhanceSettings(){
     const root=$('#co70-settings');if(!root)return;
     const cards=$$('.co70-card',root);cards.forEach(c=>c.classList.add('co90-system-card'));
-    const st=$('#co70-u-status');if(st&&!/0\.9\.0/.test(st.textContent||''))st.textContent=`Interface ${UI} active · remote update channel ready.`;
+    const st=$('#co70-u-status');if(st)st.textContent=`Interface ${UI} active · remote update channel ready.`;
     const progress=root.querySelector('.co70-progress i');if(progress)progress.style.width='100%';
   }
 
