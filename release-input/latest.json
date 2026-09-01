@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.8.0",
+  "uiVersion": "0.9.0",
   "minimumShell": "0.5.0",
-  "notes": "Functional intelligence release: reject meaningless/random collection input, remove default/fake Orbit IQ scoring, require identifiable evidence before scoring, show Needs Evidence when confidence is insufficient, add real person profile opening with score reasons/editing/interactions/source access, restore stronger Concept 2 relationship zones, keep Crowd Orbit navigation persistent, and refine the logo with a person-shaped orbit node."
+  "notes": "Visual reset release built on the 0.8.0 evidence-safe intelligence engine: lock the current Crowd Orbit master mark, restore the premium dark Concept 1 product language and purple/gold visual discipline, retain Concept 2 relationship-zone orbit logic, simplify headlines and navigation, keep real person profiles and Needs Evidence scoring intact, and preserve remote update plus local backup/recovery controls."
 }
