@@ -49,6 +49,7 @@ jobs:
           cp release-input/v080.css build-ui/v080.css
           cp release-input/v090.js build-ui/v090.js
           cp release-input/v090.css build-ui/v090.css
+          cp release-input/v091.css build-ui/v091.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -78,7 +79,8 @@ jobs:
             '<link rel="stylesheet" href="v074.css">',
             '<link rel="stylesheet" href="v075.css">',
             '<link rel="stylesheet" href="v080.css">',
-            '<link rel="stylesheet" href="v090.css">'
+            '<link rel="stylesheet" href="v090.css">',
+            '<link rel="stylesheet" href="v091.css">'
           ]
           for tag in scripts+styles:
               html=html.replace(tag,'')
@@ -99,7 +101,7 @@ jobs:
           node --check build-ui/v080-ui.js
           node --check build-ui/v090.js
 
-          # Runtime checks: keep 0.8 evidence rules intact through the visual reset.
+          # Runtime checks: keep evidence rules intact through the visual hotfix.
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm');
           const store=new Map();
@@ -119,7 +121,7 @@ jobs:
             if(p.opportunity_score===null) throw new Error('Evidence-backed person was not scored');
             const weak=await ctx.CrowdOrbitLocalAPI.api('/api/people',{method:'POST',body:JSON.stringify({name:'Actual Person',role:'Artist'})});
             if(weak.person.opportunity_score!==null) throw new Error('Sparse person received a fake score');
-            console.log('Crowd Orbit 0.9 evidence scoring PASS');
+            console.log('Crowd Orbit 0.9.1 evidence scoring PASS');
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
 
@@ -129,8 +131,10 @@ jobs:
           grep -q 'person-shaped orbit node' build-ui/crowd-orbit-mark.svg
           grep -q 'FIND · CONNECT · BUILD' build-ui/v090.js
           grep -q 'co90-orbit-halo' build-ui/v090.css
+          grep -q 'body > \*:not(#co70-app):not(#co80-person)' build-ui/v091.css
           grep -q 'v090.js' build-ui/index.html
           grep -q 'v090.css' build-ui/index.html
+          grep -q 'v091.css' build-ui/index.html
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
