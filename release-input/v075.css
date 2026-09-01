@@ -1,0 +1,15 @@
+html[data-remote-ui^="0.7."] #co70-app .co70-nav{transform:translateX(-50%)!important;opacity:1!important;pointer-events:auto!important;bottom:34px!important}
+html[data-remote-ui^="0.7."] #co70-app.co74-tablet.co74-nav-hidden .co70-nav{transform:translateX(-50%)!important;opacity:1!important;pointer-events:auto!important}
+.co74-nav-sensor{display:none!important}
+html[data-remote-ui^="0.7."] #co70-app{padding-bottom:150px!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-orbit-stage{overflow:hidden!important}
+html[data-remote-ui^="0.7."] #co70-app .co74-zone.outer{width:94%!important;height:86%!important}
+html[data-remote-ui^="0.7."] #co70-app .co74-zone.active{width:70%!important;height:62%!important}
+html[data-remote-ui^="0.7."] #co70-app .co74-zone.inner{width:42%!important;height:38%!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-ring.r1{width:22%!important;height:20%!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-ring.r2{width:45%!important;height:40%!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-ring.r3{width:69%!important;height:61%!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-ring.r4{width:94%!important;height:86%!important}
+html[data-remote-ui^="0.7."] #co70-app .co74-zone span{right:4%!important;top:9%!important}
+html[data-remote-ui^="0.7."] #co70-app .co70-node{transition:left .24s ease,top .24s ease}
+@media(min-width:620px){html[data-remote-ui^="0.7."] #co70-app .co70-orbit-stage{height:360px!important}html[data-remote-ui^="0.7."] #co70-app.co73-empty-network .co70-orbit-stage{height:265px!important}}
