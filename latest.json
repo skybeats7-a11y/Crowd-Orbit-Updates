@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.9.1",
+  "uiVersion": "0.10.0",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.9.1.zip",
-  "sha256": "b3f14ce5aa91580686c5e54dad2c4fb859ed87b67c002e8e10d4f129b1d8c0b9",
-  "notes": "Hotfix: show only the current dark Crowd Orbit interface, suppress the legacy cream shell and duplicate navigation, keep the 0.9 visual reset active across point releases, and preserve all 0.8 evidence-safe scoring, profiles, relationship zones, remote update and backup behaviour."
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.10.0.zip",
+  "sha256": "5c9d5ffe840abf78d92a7e09a9d02d21a13a581ae3a6ff20ccf6a72a08644712",
+  "notes": "Functional Beta: evidence-gated Signal Score and unscored dashes, Action Centre semantics, CSV/TXT/JSON crowd import, expanded Radar filtering, campaign contact queues with workflow statuses, and preserved 0.9 visual design, profiles, backup and remote updating."
 }
