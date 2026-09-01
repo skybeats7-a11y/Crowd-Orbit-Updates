@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.7.5",
+  "uiVersion": "0.8.0",
   "minimumShell": "0.5.0",
-  "notes": "Correct tablet navigation behaviour and Orbit spacing: keep Crowd Orbit's own bottom navigation permanently visible, remove the temporary app-nav auto-hide sensor, preserve the real Concept 2 Orbit zones, and spread people across wider relationship/opportunity bands so the map is less clumped. Android system navigation full-screen is reserved for Engine 5.2."
+  "notes": "Functional intelligence release: reject meaningless/random collection input, remove default/fake Orbit IQ scoring, require identifiable evidence before scoring, show Needs Evidence when confidence is insufficient, add real person profile opening with score reasons/editing/interactions/source access, restore stronger Concept 2 relationship zones, keep Crowd Orbit navigation persistent, and refine the logo with a person-shaped orbit node."
 }
