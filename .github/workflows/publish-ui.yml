@@ -106,7 +106,7 @@ jobs:
           grep -q 'co74-zones' build-ui/v074.js
           grep -q 'keepAppNavVisible' build-ui/v075.js
           grep -q 'spreadOrbitNodes' build-ui/v075.js
-          grep -q 'co70-nav-hidden' build-ui/v075.css
+          grep -q 'co74-nav-hidden' build-ui/v075.css
           grep -q 'v075.css' build-ui/index.html
           grep -q 'v075.js' build-ui/index.html
 
