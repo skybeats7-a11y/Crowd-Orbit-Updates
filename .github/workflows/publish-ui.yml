@@ -42,6 +42,8 @@ jobs:
           cp release-input/v073.css build-ui/v073.css
           cp release-input/v074.js build-ui/v074.js
           cp release-input/v074.css build-ui/v074.css
+          cp release-input/v075.js build-ui/v075.js
+          cp release-input/v075.css build-ui/v075.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -59,12 +61,14 @@ jobs:
             '<script src="v070.js" defer></script>',
             '<script src="v072.js" defer></script>',
             '<script src="v073.js" defer></script>',
-            '<script src="v074.js" defer></script>'
+            '<script src="v074.js" defer></script>',
+            '<script src="v075.js" defer></script>'
           ]
           styles=[
             '<link rel="stylesheet" href="v072.css">',
             '<link rel="stylesheet" href="v073.css">',
-            '<link rel="stylesheet" href="v074.css">'
+            '<link rel="stylesheet" href="v074.css">',
+            '<link rel="stylesheet" href="v075.css">'
           ]
           for tag in scripts+styles:
               html=html.replace(tag,'')
@@ -83,6 +87,7 @@ jobs:
           node --check build-ui/v072.js
           node --check build-ui/v073.js
           node --check build-ui/v074.js
+          node --check build-ui/v075.js
 
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm');
@@ -98,11 +103,12 @@ jobs:
           });
           NODE
 
-          grep -q 'co74-nav-hidden' build-ui/v074.js
           grep -q 'co74-zones' build-ui/v074.js
-          grep -q 'co74-zone.outer' build-ui/v074.css
-          grep -q 'v074.css' build-ui/index.html
-          grep -q 'v074.js' build-ui/index.html
+          grep -q 'keepAppNavVisible' build-ui/v075.js
+          grep -q 'spreadOrbitNodes' build-ui/v075.js
+          grep -q 'co70-nav-hidden' build-ui/v075.css
+          grep -q 'v075.css' build-ui/index.html
+          grep -q 'v075.js' build-ui/index.html
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"
