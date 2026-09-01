@@ -2,6 +2,6 @@
   "uiVersion": "0.7.5",
   "minimumShell": "0.5.0",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.7.5.zip",
-  "sha256": "65a624fcf61e31edb8faf0444565fe4bbeda762c10f4ab88510c42007627593a",
+  "sha256": "f8a71c4480f9cd2e366c16520a2296a2b3e70d37bdcebc8f1879ba361c645829",
   "notes": "Correct tablet navigation behaviour and Orbit spacing: keep Crowd Orbit's own bottom navigation permanently visible, remove the temporary app-nav auto-hide sensor, preserve the real Concept 2 Orbit zones, and spread people across wider relationship/opportunity bands so the map is less clumped. Android system navigation full-screen is reserved for Engine 5.2."
 }
