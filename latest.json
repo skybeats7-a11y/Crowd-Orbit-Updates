@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.8.0",
+  "uiVersion": "0.9.0",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.8.0.zip",
-  "sha256": "68c6043b43edfad4f46ad3797aebf28b625dee07b87f74b4e2227cb99be32458",
-  "notes": "Functional intelligence release: reject meaningless/random collection input, remove default/fake Orbit IQ scoring, require identifiable evidence before scoring, show Needs Evidence when confidence is insufficient, add real person profile opening with score reasons/editing/interactions/source access, restore stronger Concept 2 relationship zones, keep Crowd Orbit navigation persistent, and refine the logo with a person-shaped orbit node."
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.9.0.zip",
+  "sha256": "0f24346963b413ea6bd709a9fb19b389866ca565409ccb341d0d93e2b36e3d17",
+  "notes": "Visual reset release built on the 0.8.0 evidence-safe intelligence engine: lock the current Crowd Orbit master mark, restore the premium dark Concept 1 product language and purple/gold visual discipline, retain Concept 2 relationship-zone orbit logic, simplify headlines and navigation, keep real person profiles and Needs Evidence scoring intact, and preserve remote update plus local backup/recovery controls."
 }
