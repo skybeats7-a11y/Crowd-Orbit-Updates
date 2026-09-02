@@ -22,6 +22,14 @@
     }
     return '';
   }
+  function cleanShareText(payload){
+    const lines=[payload.title,payload.text].filter(Boolean).join('\n').split(/\r?\n/).map(text).filter(Boolean);
+    return lines.filter(line=>{
+      if(/^(?:instagram|tiktok|twitter|x|youtube|linkedin|soundcloud|spotify)\s+share$/i.test(line))return false;
+      if(/^share(?:d)?\s+(?:a\s+)?profile$/i.test(line))return false;
+      return true;
+    }).join('\n');
+  }
   function goCollect(message){
     const nav=document.querySelector('#co70-app .co70-nav [data-nav="collect"]');
     if(nav&&!nav.classList.contains('active'))nav.click();
@@ -29,7 +37,7 @@
       const status=document.querySelector('#co70-collect-result');
       if(status){status.className='co70-status';status.textContent=message}
       const preview=document.querySelector('#co110-preview');
-      if(preview&&!preview.children.length)preview.innerHTML='<div class="co110-empty"><strong>Scanning public profile…</strong><p>Crowd Orbit is checking the public profile for name, bio, audience and other visible evidence before analysis.</p></div>';
+      if(preview&&!preview.children.length)preview.innerHTML='<div class="co110-empty"><strong>Scanning public profile…</strong><p>Crowd Orbit is checking visible profile text, public metadata, audience and other evidence before analysis.</p></div>';
     },120);
   }
   function savePending(item){try{localStorage.setItem(PENDING_KEY,JSON.stringify(item))}catch{}}
@@ -50,16 +58,17 @@
     }
     if(!job||!job.original)return false;
     pending.delete(id);clearPending();
-    const base=[job.payload.title,job.payload.text].filter(Boolean).join('\n').trim();
+    const base=cleanShareText(job.payload);
     if(result.ok&&text(result.scanText)){
-      const enriched=[base,'AUTOMATIC PUBLIC PROFILE SCAN',text(result.scanText)].filter(Boolean).join('\n');
+      const enriched=['VISIBLE / PUBLIC PROFILE EVIDENCE',text(result.scanText),base,'SOURCE SHARE ROUTE',job.url].filter(Boolean).join('\n');
       goCollect(`Public ${text(result.platform)||'profile'} scan complete. Analysing the evidence…`);
-      return job.original.receive({text:enriched,title:job.payload.title});
+      return job.original.receive({text:enriched,title:''});
     }
-    const ok=job.original.receive(job.payload);
+    const fallback={text:[base,job.url].filter(Boolean).join('\n'),title:''};
+    const ok=job.original.receive(fallback);
     setTimeout(()=>{
       const status=document.querySelector('#co70-collect-result');
-      if(status){status.className='co70-status error';status.textContent='The profile was shared successfully, but this platform did not expose enough public metadata for an automatic scan. Crowd Orbit has kept the profile link for review.'}
+      if(status){status.className='co70-status error';status.textContent='The profile was shared successfully, but Crowd Orbit could not read enough visible or public profile evidence. The profile route has been kept for review.'}
     },250);
     return ok;
   }
