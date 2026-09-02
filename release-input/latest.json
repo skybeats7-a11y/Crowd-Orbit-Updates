@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.11.1",
+  "uiVersion": "0.11.2",
   "minimumShell": "0.5.0",
-  "notes": "Reliability hotfix: the legacy light interface is suppressed before first paint; the Orbit map opens once with three stable intelligence zones and deterministic node placement; Android-shared profile text is retained in a local inbox until Collect receives and analyses it. Engine 5.3 adds the matching native share hand-off and corrected adaptive tablet icon."
+  "notes": "State continuity hotfix: Crowd Orbit now remembers the active section, scroll position, Collect draft and open person when Android backgrounds or recreates the interface, while incoming profile shares still take priority. The 0.11 stable Orbit layout and share inbox remain intact."
 }
