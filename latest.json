@@ -1,7 +1,7 @@
 {
-  "uiVersion": "0.11.0",
+  "uiVersion": "0.11.1",
   "minimumShell": "0.5.0",
-  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.11.0.zip",
-  "sha256": "91cc112bb475f8fb0cd3536f4b5a333760e54b4982e38492ffd53266d51e53bb",
-  "notes": "Social Profile Analysis: copied or Android-shared account information is analysed as complete profiles, with a review-before-save evidence preview, role and secondary-role detection, audience/location/public-contact extraction, URL-only warnings, reliable cascading person deletion, clickable People records, richer person details, quick actions and recent activity. Engine 5.1 remains unchanged."
+  "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.11.1.zip",
+  "sha256": "ccfdd54092bf38a761272c20aea52a3a0189d74e988f30b1b1d612697a455df8",
+  "notes": "Reliability hotfix: the legacy light interface is suppressed before first paint; the Orbit map opens once with three stable intelligence zones and deterministic node placement; Android-shared profile text is retained in a local inbox until Collect receives and analyses it. Engine 5.3 adds the matching native share hand-off and corrected adaptive tablet icon."
 }
