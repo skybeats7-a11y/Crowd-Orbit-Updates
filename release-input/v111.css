@@ -1,0 +1,25 @@
+/* Crowd Orbit Interface 0.11.1: one stable Concept-2 map from the first frame. */
+html[data-release-ui^="0.11."] #co70-app .co70-ring,
+html[data-release-ui^="0.11."] #co70-app .co70-axis,
+html[data-release-ui^="0.11."] #co70-app .co73-zone-labels,
+html[data-release-ui^="0.11."] #co70-app .co74-zones,
+html[data-release-ui^="0.11."] #co70-app .co90-orbit-halo,
+html[data-release-ui^="0.11."] #co70-app .co73-you{display:none!important}
+
+html[data-release-ui^="0.11."] #co70-app .co70-orbit-stage:not(.co111-laid-out) .co70-node{opacity:0!important}
+html[data-release-ui^="0.11."] #co70-app .co70-orbit-stage.co111-laid-out .co70-node{
+  opacity:1;
+  transition:left .24s ease,top .24s ease,opacity .16s ease;
+}
+
+html[data-release-ui^="0.11."] #co70-app .co80-zones{inset:5% 4%;z-index:1}
+html[data-release-ui^="0.11."] #co70-app .co80-zone.outer{width:94%;height:86%}
+html[data-release-ui^="0.11."] #co70-app .co80-zone.active{width:70%;height:62%}
+html[data-release-ui^="0.11."] #co70-app .co80-zone.inner{width:42%;height:37%}
+html[data-release-ui^="0.11."] #co70-app .co70-centre{z-index:8!important}
+html[data-release-ui^="0.11."] #co70-app .co70-node{z-index:7!important}
+
+@media(max-width:620px){
+  html[data-release-ui^="0.11."] #co70-app .co80-zones{inset:7% 3%}
+  html[data-release-ui^="0.11."] #co70-app .co80-zone.outer{width:96%;height:84%}
+}

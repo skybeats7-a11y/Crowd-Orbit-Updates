@@ -5,10 +5,36 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   const fmt=n=>Number(n||0).toLocaleString('en-GB');
   const ROLES=['Unknown','Artist','Producer','Engineer','Songwriter','Manager','DJ','A&R','Label','Media'];
-  let working=false,lastPreview=null,shareHandled=false;
-  const params=new URLSearchParams(location.search);
-  const sharedText=['share','text','share_url','url','title','subject'].map(k=>params.get(k)).filter(Boolean).join('\n').trim();
-  if(sharedText){try{history.replaceState({},'',location.pathname)}catch{}}
+  const SHARE_KEY='crowd_orbit_share_inbox_v1';
+  let working=false,lastPreview=null,shareHandled=false,sharedText='',sharedTitle='',lastConsumedSignature='',lastConsumedAt=0;
+
+  function normaliseShare(raw){
+    let value=raw;
+    if(typeof value==='string'){
+      try{const parsed=JSON.parse(value);if(parsed&&typeof parsed==='object')value=parsed;else value={text:value}}catch{value={text:value}}
+    }
+    value=value&&typeof value==='object'?value:{};
+    const title=text(value.title||value.subject),parts=[value.text,value.share,value.share_url,value.url].map(text).filter(Boolean);
+    const unique=[...new Set(parts)];if(title&&!unique.some(x=>x.includes(title)))unique.unshift(title);
+    return {text:unique.join('\n').trim(),title};
+  }
+  function shareSignature(value){return text(value).toLowerCase().replace(/\s+/g,' ').slice(0,4000)}
+  function acceptShare(raw,{persist=true}={}){
+    const payload=normaliseShare(raw);if(!payload.text)return false;
+    const signature=shareSignature(payload.text);
+    if(signature===lastConsumedSignature&&Date.now()-lastConsumedAt<5000)return true;
+    sharedText=payload.text;sharedTitle=payload.title;shareHandled=false;
+    if(persist){try{localStorage.setItem(SHARE_KEY,JSON.stringify({...payload,received_at:new Date().toISOString()}))}catch{}}
+    setTimeout(()=>{run();setTimeout(consumeShare,160)},80);return true;
+  }
+  function recoverShare(){
+    if(sharedText)return true;
+    try{const saved=localStorage.getItem(SHARE_KEY);return saved?acceptShare(saved,{persist:false}):false}catch{return false}
+  }
+  const params=new URLSearchParams(location.search),queryShare={};
+  ['share','text','share_url','url','title','subject'].forEach(k=>{const value=params.get(k);if(value)queryShare[k]=value});
+  if(acceptShare(queryShare)){try{history.replaceState({},'',location.pathname+(location.hash||''))}catch{}}
+  else recoverShare();
 
   function toast(message,tone='ok'){
     let el=$('#co110-toast');if(!el){el=document.createElement('div');el.id='co110-toast';($('#co70-app')||document.body).appendChild(el)}
@@ -86,8 +112,11 @@
   }
   function consumeShare(){
     if(!sharedText||shareHandled)return;const app=$('#co70-app');if(!app)return;
-    if(!$('#co70-collect')?.classList.contains('active')){go('collect');return}
-    const input=$('#co70-paste');if(!input)return;shareHandled=true;input.value=sharedText;toast('Shared profile loaded for review');setTimeout(preview,120);
+    if(!$('#co70-collect')?.classList.contains('active')){go('collect');setTimeout(consumeShare,180);return}
+    const input=$('#co70-paste');if(!input){setTimeout(consumeShare,120);return}
+    const value=sharedText,signature=shareSignature(value);shareHandled=true;lastConsumedSignature=signature;lastConsumedAt=Date.now();
+    sharedText='';sharedTitle='';try{localStorage.removeItem(SHARE_KEY)}catch{}
+    input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));toast('Shared profile loaded for review');setTimeout(preview,120);
   }
   async function enhanceOrbit(){
     const root=$('#co70-orbit');if(!root)return;
@@ -109,6 +138,11 @@
     api(`/api/people/${id}`,{method:'DELETE'}).then(result=>{window.CrowdOrbit080?.closePerson?.();document.querySelector('#co70-refresh')?.click();toast(`Person deleted · ${result.remaining} remaining`)}).catch(err=>{button.disabled=false;button.dataset.confirmDelete='0';button.textContent='Delete';if(status){status.className='co70-status error';status.textContent='Delete failed: '+String(err.message||err)}});
   },true);
   async function run(){if(working)return;working=true;try{enhanceCollect();await enhanceOrbit();consumeShare()}catch(e){console.error('Crowd Orbit 0.11 enhancement',e)}finally{working=false}}
+  window.CrowdOrbitShare=Object.assign(window.CrowdOrbitShare||{},{receive:raw=>acceptShare(raw)});
+  window.addEventListener('crowdorbitshare',event=>acceptShare(event.detail));
+  window.addEventListener('pageshow',()=>{recoverShare();setTimeout(run,80)});
+  window.addEventListener('focus',()=>{recoverShare();setTimeout(run,80)});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){recoverShare();setTimeout(run,80)}});
   let timer;new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(run,90)}).observe(document.documentElement,{subtree:true,childList:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(run,240),{once:true});else setTimeout(run,240);
 })();

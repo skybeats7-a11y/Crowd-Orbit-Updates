@@ -1,6 +1,7 @@
 'use strict';
 (() => {
   const ROOT='#co70-app';
+  const current011=()=>String(document.documentElement.dataset.releaseUi||document.documentElement.dataset.remoteUi||'').startsWith('0.11.');
   function enhance(){
     const app=document.querySelector(ROOT);if(!app)return;
     app.classList.toggle('co73-tablet',window.innerWidth>=520);
@@ -9,11 +10,15 @@
     app.classList.toggle('co73-empty-network',empty);
     const stage=app.querySelector('.co70-orbit-stage');
     if(stage){
-      if(!stage.querySelector('.co73-zone-labels')){
+      if(current011()){
+        stage.querySelectorAll('.co73-zone-labels,.co73-you').forEach(el=>el.remove());
+      }else if(!stage.querySelector('.co73-zone-labels')){
         const z=document.createElement('div');z.className='co73-zone-labels';z.innerHTML='<span class="inner">INNER ORBIT</span><span class="active">ACTIVE SIGNAL</span><span class="outer">OUTER ORBIT</span>';stage.appendChild(z);
       }
-      let you=stage.querySelector('.co73-you');
-      if(!you){you=document.createElement('span');you.className='co73-you';you.textContent='YOU';stage.querySelector('.co70-centre')?.appendChild(you)}
+      if(!current011()){
+        let you=stage.querySelector('.co73-you');
+        if(!you){you=document.createElement('span');you.className='co73-you';you.textContent='YOU';stage.querySelector('.co70-centre')?.appendChild(you)}
+      }
       let msg=stage.querySelector('.co73-empty-copy');
       if(empty&&!msg){msg=document.createElement('div');msg.className='co73-empty-copy';msg.innerHTML='<strong>Your orbit is ready.</strong><span>Collect people and they will organise around you by relationship strength, contactability and opportunity.</span>';stage.appendChild(msg)}
       if(!empty&&msg)msg.remove();

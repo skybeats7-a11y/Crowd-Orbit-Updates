@@ -34,7 +34,10 @@
     const root=$('#co70-orbit');if(!root)return;
     const h=root.querySelector('.co70-headline h1');if(h)h.innerHTML='Your network.<br><span>In motion.</span>';
     const p=root.querySelector('.co70-headline p');if(p)p.textContent='See who matters, where they sit in your orbit, and what deserves your attention next.';
-    const stage=root.querySelector('.co70-orbit-stage');if(stage&&!stage.querySelector('.co90-orbit-halo')){
+    const stage=root.querySelector('.co70-orbit-stage');
+    if(stage&&String(UI).startsWith('0.11.')){
+      stage.querySelectorAll('.co90-orbit-halo').forEach(el=>el.remove());
+    }else if(stage&&!stage.querySelector('.co90-orbit-halo')){
       const halo=document.createElement('div');halo.className='co90-orbit-halo';halo.innerHTML='<i></i><i></i><i></i>';stage.prepend(halo);
     }
     const centre=root.querySelector('.co70-centre');if(centre&&!centre.querySelector('.co90-you')){

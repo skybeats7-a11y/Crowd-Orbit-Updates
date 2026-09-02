@@ -2,6 +2,7 @@
 (() => {
   const app=()=>document.querySelector('#co70-app');
   const stage=()=>document.querySelector('#co70-app .co70-orbit-stage');
+  const current011=()=>String(document.documentElement.dataset.releaseUi||document.documentElement.dataset.remoteUi||'').startsWith('0.11.');
 
   function keepAppNavVisible(){
     const a=app();if(!a)return;
@@ -11,6 +12,7 @@
 
   function spreadOrbitNodes(){
     const s=stage();if(!s)return;
+    if(current011())return;
     const nodes=[...s.querySelectorAll('.co70-node')];
     nodes.forEach((node,i)=>{
       const id=Number(node.dataset.person||i+1);
@@ -34,6 +36,10 @@
 
   function refineZones(){
     const s=stage();if(!s)return;
+    if(current011()){
+      s.querySelectorAll('.co74-zones').forEach(el=>el.remove());
+      return;
+    }
     const zones=s.querySelector('.co74-zones');
     if(zones)zones.classList.add('co75-zones');
     const labels={outer:'DISCOVERY / OUTER',active:'ACTIVE SIGNAL',inner:'INNER ORBIT'};

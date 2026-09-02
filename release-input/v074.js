@@ -7,6 +7,7 @@
   const app=()=>document.querySelector('#co70-app');
   const nav=()=>document.querySelector('#co70-app .co70-nav');
   const tablet=()=>window.innerWidth>=TABLET_MIN;
+  const current011=()=>String(document.documentElement.dataset.releaseUi||document.documentElement.dataset.remoteUi||'').startsWith('0.11.');
 
   function scheduleHide(delay=HIDE_DELAY){
     clearTimeout(hideTimer);
@@ -51,6 +52,10 @@
     const stage=document.querySelector('#co70-app .co70-orbit-stage');
     if(!stage)return;
     const old=stage.querySelector('.co73-zone-labels');if(old)old.remove();
+    if(current011()){
+      stage.querySelectorAll('.co74-zones').forEach(el=>el.remove());
+      return;
+    }
     if(stage.querySelector('.co74-zones'))return;
     const zones=document.createElement('div');
     zones.className='co74-zones';

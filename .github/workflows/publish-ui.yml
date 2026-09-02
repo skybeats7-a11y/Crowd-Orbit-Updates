@@ -55,6 +55,8 @@ jobs:
           cp release-input/v110-data.js build-ui/v110-data.js
           cp release-input/v110.js build-ui/v110.js
           cp release-input/v110.css build-ui/v110.css
+          cp release-input/v111.js build-ui/v111.js
+          cp release-input/v111.css build-ui/v111.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -67,6 +69,7 @@ jobs:
 
           p=Path('build-ui/index.html')
           html=p.read_text()
+          html=html.replace('<meta name="theme-color" content="#f5f1e8">','<meta name="theme-color" content="#090a10">')
           # The original embedded shell auto-saved Android shares before the
           # evidence-review interface loaded. Interface 0.11 owns share intake.
           html=html.replace('renderHome();handleShare();','renderHome();')
@@ -85,6 +88,7 @@ jobs:
             '<script src="v090.js" defer></script>'
             ,'<script src="v100.js" defer></script>'
             ,'<script src="v110.js" defer></script>'
+            ,'<script src="v111.js" defer></script>'
           ]
           styles=[
             '<link rel="stylesheet" href="v072.css">',
@@ -96,12 +100,14 @@ jobs:
             '<link rel="stylesheet" href="v091.css">'
             ,'<link rel="stylesheet" href="v100.css">'
             ,'<link rel="stylesheet" href="v110.css">'
+            ,'<link rel="stylesheet" href="v111.css">'
           ]
           for tag in scripts+styles:
               html=html.replace(tag,'')
           if '</head>' not in html or '</body>' not in html:
               raise SystemExit('Could not locate interface document anchors')
-          html=html.replace('</head>', '  '+'\n  '.join(styles)+'\n</head>')
+          critical='<style id="co-release-bootstrap">html,body{background:#090a10!important;color:#f7f5ef}body>#app,body>.nav,body>#drawer,body>#toast{display:none!important}</style>'
+          html=html.replace('</head>', '  '+critical+'\n  '+'\n  '.join(styles)+'\n</head>')
           html=html.replace('</body>', '  '+'\n  '.join(scripts)+'\n</body>')
           p.write_text(html)
           PY
@@ -118,6 +124,7 @@ jobs:
           node --check build-ui/v100.js
           node --check build-ui/v110-data.js
           node --check build-ui/v110.js
+          node --check build-ui/v111.js
 
           # Runtime checks: keep evidence rules intact through the visual hotfix.
           node - <<'NODE'
@@ -185,8 +192,16 @@ jobs:
           grep -q 'v110-data.js' build-ui/index.html
           grep -q 'v110.js' build-ui/index.html
           grep -q 'v110.css' build-ui/index.html
+          grep -q 'v111.js' build-ui/index.html
+          grep -q 'v111.css' build-ui/index.html
+          grep -q 'co-release-bootstrap' build-ui/index.html
+          grep -q 'body>#app' build-ui/index.html
           grep -q 'ANALYSIS PREVIEW' build-ui/v110.js
           grep -q 'Tap again to delete permanently' build-ui/v110.js
+          grep -q 'CrowdOrbitShare' build-ui/v110.js
+          grep -q 'crowd_orbit_share_inbox_v1' build-ui/v110.js
+          grep -q 'co111-laid-out' build-ui/v111.js
+          grep -q 'co90-orbit-halo' build-ui/v111.js
           grep -q '/api/social-preview' build-ui/v110-data.js
           grep -q '/api/social-import' build-ui/v110-data.js
           grep -q "method==='DELETE'" build-ui/v110-data.js
