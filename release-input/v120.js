@@ -60,7 +60,7 @@
     pending.delete(id);clearPending();
     const base=cleanShareText(job.payload);
     if(result.ok&&text(result.scanText)){
-      const enriched=['VISIBLE / PUBLIC PROFILE EVIDENCE',text(result.scanText),base,'SOURCE SHARE ROUTE',job.url].filter(Boolean).join('\n');
+      const enriched=[text(result.scanText),base,job.url].filter(Boolean).join('\n');
       goCollect(`Public ${text(result.platform)||'profile'} scan complete. Analysing the evidence…`);
       return job.original.receive({text:enriched,title:''});
     }
