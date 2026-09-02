@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.10.0",
+  "uiVersion": "0.11.0",
   "minimumShell": "0.5.0",
-  "notes": "Functional Beta: evidence-gated Signal Score and unscored dashes, Action Centre semantics, CSV/TXT/JSON crowd import, expanded Radar filtering, campaign contact queues with workflow statuses, and preserved 0.9 visual design, profiles, backup and remote updating."
+  "notes": "Social Profile Analysis: copied or Android-shared account information is analysed as complete profiles, with a review-before-save evidence preview, role and secondary-role detection, audience/location/public-contact extraction, URL-only warnings, reliable cascading person deletion, clickable People records, richer person details, quick actions and recent activity. Engine 5.1 remains unchanged."
 }

@@ -25,7 +25,7 @@
     const root=$('#co70-collect');if(!root||$('#co100-import'))return;
     const actions=root.querySelector('.co70-actions');actions?.insertAdjacentHTML('beforeend','<button id="co100-import" class="co70-btn ghost">Import CSV / TXT / JSON</button><input id="co100-file" type="file" accept=".csv,.txt,.json,text/csv,text/plain,application/json" hidden>');
     $('#co100-import').onclick=()=>$('#co100-file').click();
-    $('#co100-file').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;const st=$('#co70-collect-result');try{let text=await f.text();if(f.name.toLowerCase().endsWith('.json')){const j=JSON.parse(text);const rows=Array.isArray(j)?j:(j.people||[]);text=rows.map(p=>[p.name,p.handle,p.role,p.location,p.contact_email||p.email,p.phone_number||p.phone,p.source_url].filter(Boolean).join(', ')).join('\n')}$('#co70-paste').value=text;st.className='co70-status ok';st.textContent=`${f.name} loaded. Review it, then press Analyse & add crowd.`}catch(err){st.className='co70-status error';st.textContent='Could not read that file: '+err.message}};
+    $('#co100-file').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;const st=$('#co70-collect-result');try{let text=await f.text();if(f.name.toLowerCase().endsWith('.json')){const j=JSON.parse(text);const rows=Array.isArray(j)?j:(j.people||[]);text=rows.map(p=>[p.name,p.handle,p.role,p.location,p.contact_email||p.email,p.phone_number||p.phone,p.source_url].filter(Boolean).join(', ')).join('\n')}$('#co70-paste').value=text;st.className='co70-status ok';st.textContent=`${f.name} loaded. Review it, then press Analyse copied profiles.`}catch(err){st.className='co70-status error';st.textContent='Could not read that file: '+err.message}};
   }
 
   async function enhanceCampaigns(){

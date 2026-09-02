@@ -51,6 +51,7 @@
       settings:['SYSTEM','Crowd Orbit under control.','Remote interface updates, local-first data, backup and recovery without reinstalling the app.']
     };
     Object.entries(map).forEach(([key,[ey,title,desc]])=>{
+      if(key==='collect'&&String(UI).startsWith('0.11.'))return;
       const root=$(`#co70-${key}`);if(!root)return;const head=root.querySelector('.co70-headline');if(!head)return;
       const e=head.querySelector('.co70-eyebrow');if(e)e.textContent=ey;
       const h=head.querySelector('h1');if(h)h.innerHTML=title;

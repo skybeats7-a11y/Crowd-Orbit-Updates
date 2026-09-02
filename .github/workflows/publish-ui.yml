@@ -52,6 +52,9 @@ jobs:
           cp release-input/v091.css build-ui/v091.css
           cp release-input/v100.js build-ui/v100.js
           cp release-input/v100.css build-ui/v100.css
+          cp release-input/v110-data.js build-ui/v110-data.js
+          cp release-input/v110.js build-ui/v110.js
+          cp release-input/v110.css build-ui/v110.css
           cp release-input/crowd-orbit-mark.svg build-ui/crowd-orbit-mark.svg
           python - <<PY
           from pathlib import Path
@@ -64,9 +67,15 @@ jobs:
 
           p=Path('build-ui/index.html')
           html=p.read_text()
+          # The original embedded shell auto-saved Android shares before the
+          # evidence-review interface loaded. Interface 0.11 owns share intake.
+          html=html.replace('renderHome();handleShare();','renderHome();')
+          if 'renderHome();handleShare();' in html:
+              raise SystemExit('Could not disable legacy share auto-save')
           scripts=[
             '<script src="offline-data.js"></script>',
             '<script src="v080-data.js"></script>',
+            '<script src="v110-data.js"></script>',
             '<script src="v070.js" defer></script>',
             '<script src="v072.js" defer></script>',
             '<script src="v073.js" defer></script>',
@@ -75,6 +84,7 @@ jobs:
             '<script src="v080-ui.js" defer></script>',
             '<script src="v090.js" defer></script>'
             ,'<script src="v100.js" defer></script>'
+            ,'<script src="v110.js" defer></script>'
           ]
           styles=[
             '<link rel="stylesheet" href="v072.css">',
@@ -85,6 +95,7 @@ jobs:
             '<link rel="stylesheet" href="v090.css">',
             '<link rel="stylesheet" href="v091.css">'
             ,'<link rel="stylesheet" href="v100.css">'
+            ,'<link rel="stylesheet" href="v110.css">'
           ]
           for tag in scripts+styles:
               html=html.replace(tag,'')
@@ -105,6 +116,8 @@ jobs:
           node --check build-ui/v080-ui.js
           node --check build-ui/v090.js
           node --check build-ui/v100.js
+          node --check build-ui/v110-data.js
+          node --check build-ui/v110.js
 
           # Runtime checks: keep evidence rules intact through the visual hotfix.
           node - <<'NODE'
@@ -115,6 +128,7 @@ jobs:
           vm.createContext(ctx);
           vm.runInContext(fs.readFileSync('build-ui/offline-data.js','utf8'),ctx);
           vm.runInContext(fs.readFileSync('build-ui/v080-data.js','utf8'),ctx);
+          vm.runInContext(fs.readFileSync('build-ui/v110-data.js','utf8'),ctx);
           if(!ctx.CrowdOrbitLocalAPI || typeof ctx.CrowdOrbitLocalAPI.api!=='function') throw new Error('CrowdOrbitLocalAPI did not initialise');
           (async()=>{
             let rejected=false;
@@ -126,7 +140,29 @@ jobs:
             if(p.opportunity_score===null) throw new Error('Evidence-backed person was not scored');
             const weak=await ctx.CrowdOrbitLocalAPI.api('/api/people',{method:'POST',body:JSON.stringify({name:'Actual Person',role:'Artist'})});
             if(weak.person.opportunity_score!==null) throw new Error('Sparse person received a fake score');
-            console.log('Crowd Orbit 0.10.0 evidence scoring PASS');
+            const copied=`Nova Vale\n@novavale\nIndependent artist · singer / songwriter\n📍 London\n12.4K followers\nBookings: nova@example.com\nhttps://instagram.com/novavale`;
+            const preview=await ctx.CrowdOrbitLocalAPI.api('/api/social-preview',{method:'POST',body:JSON.stringify({text:copied})});
+            if(preview.profiles.length!==1) throw new Error('Multiline profile was split incorrectly');
+            const profile=preview.profiles[0];
+            if(profile.name!=='Nova Vale'||profile.handle!=='@novavale'||profile.role!=='Artist'||profile.secondary_roles[0]!=='Songwriter') throw new Error('Profile identity or roles were not extracted');
+            if(profile.followers!==12400||profile.location!=='London'||profile.contact_email!=='nova@example.com') throw new Error('Profile evidence fields were not extracted');
+            if(!profile.default_selected||profile.confidence<70) throw new Error('Evidence-rich profile was not ready for review');
+            const linkOnly=await ctx.CrowdOrbitLocalAPI.api('/api/social-preview',{method:'POST',body:JSON.stringify({text:'https://instagram.com/linkonlyaccount'})});
+            if(linkOnly.profiles[0].default_selected) throw new Error('URL-only profile was selected for saving');
+            if(!linkOnly.profiles[0].warnings.some(x=>x.includes('Only an account route'))) throw new Error('URL-only limitation was not explained');
+            const multi=ctx.CrowdOrbitLocalAPI.parseCopiedSocial(copied+'\n\nMaya Blue\n@mayablue\nProducer\n8,210 followers\nhttps://x.com/mayablue');
+            if(multi.profiles.length!==2) throw new Error('Multiple copied profiles were not separated');
+            const imported=await ctx.CrowdOrbitLocalAPI.api('/api/social-import',{method:'POST',body:JSON.stringify({profiles:[profile]})});
+            if(imported.created!==1||imported.people.length!==1) throw new Error('Reviewed profile was not imported');
+            const id=imported.people[0].id;
+            await ctx.CrowdOrbitLocalAPI.api(`/api/people/${id}/interactions`,{method:'POST',body:JSON.stringify({type:'Messaged',note:'Test relationship'})});
+            const campaign=await ctx.CrowdOrbitLocalAPI.api('/api/campaigns',{method:'POST',body:JSON.stringify({name:'Delete cascade test'})});
+            await ctx.CrowdOrbitLocalAPI.api(`/api/campaigns/${campaign.campaign.id}/recommend`,{method:'POST',body:JSON.stringify({personIds:[id],limit:1})});
+            const deleted=await ctx.CrowdOrbitLocalAPI.api(`/api/people/${id}`,{method:'DELETE'});
+            if(!deleted.deleted) throw new Error('Person delete endpoint did not confirm deletion');
+            const after=JSON.parse(ctx.CrowdOrbitLocalAPI.exportBackup());
+            if(after.people.some(x=>x.id===id)||after.interactions.some(x=>x.person_id===id)||after.campaignPeople.some(x=>x.person_id===id)) throw new Error('Delete did not cascade through local data');
+            console.log('Crowd Orbit 0.11 profile analysis and deletion PASS');
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
 
@@ -146,6 +182,20 @@ jobs:
           grep -q 'queueMatch' build-ui/v080-data.js
           grep -q 'v100.js' build-ui/index.html
           grep -q 'v100.css' build-ui/index.html
+          grep -q 'v110-data.js' build-ui/index.html
+          grep -q 'v110.js' build-ui/index.html
+          grep -q 'v110.css' build-ui/index.html
+          grep -q 'ANALYSIS PREVIEW' build-ui/v110.js
+          grep -q 'Tap again to delete permanently' build-ui/v110.js
+          grep -q '/api/social-preview' build-ui/v110-data.js
+          grep -q '/api/social-import' build-ui/v110-data.js
+          grep -q "method==='DELETE'" build-ui/v110-data.js
+          grep -q 'data-delete-id' build-ui/v080-ui.js
+          grep -q 'data-person=' build-ui/v070.js
+          if grep -q 'renderHome();handleShare();' build-ui/index.html; then
+            echo 'Legacy share auto-save is still active.' >&2
+            exit 1
+          fi
 
           (cd build-ui && zip -q -9 -r "../ui-$VERSION.zip" .)
           unzip -t "ui-$VERSION.zip"

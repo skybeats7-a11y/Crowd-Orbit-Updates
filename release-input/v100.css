@@ -1,6 +1,6 @@
-html[data-release-ui="0.10.0"] #co70-app .co70-toolbar{align-items:stretch}
-html[data-release-ui="0.10.0"] #co70-app .co70-toolbar .co70-input{min-width:145px}
-html[data-release-ui="0.10.0"] #co70-app .co100-queue{margin-top:14px}
-html[data-release-ui="0.10.0"] #co70-app .co100-queue .co70-row{grid-template-columns:auto minmax(0,1fr) auto minmax(120px,160px)}
-html[data-release-ui="0.10.0"] #co70-app .co100-status{width:100%}
-@media(max-width:760px){html[data-release-ui="0.10.0"] #co70-app .co100-queue .co70-row{grid-template-columns:auto 1fr auto}html[data-release-ui="0.10.0"] #co70-app .co100-status{grid-column:2/4}}
+html[data-release-ui^="0.1"] #co70-app .co70-toolbar{align-items:stretch}
+html[data-release-ui^="0.1"] #co70-app .co70-toolbar .co70-input{min-width:145px}
+html[data-release-ui^="0.1"] #co70-app .co100-queue{margin-top:14px}
+html[data-release-ui^="0.1"] #co70-app .co100-queue .co70-row{grid-template-columns:auto minmax(0,1fr) auto minmax(120px,160px)}
+html[data-release-ui^="0.1"] #co70-app .co100-status{width:100%}
+@media(max-width:760px){html[data-release-ui^="0.1"] #co70-app .co100-queue .co70-row{grid-template-columns:auto 1fr auto}html[data-release-ui^="0.1"] #co70-app .co100-status{grid-column:2/4}}
