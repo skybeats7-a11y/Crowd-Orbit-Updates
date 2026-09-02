@@ -2,6 +2,6 @@
   "uiVersion": "0.12.0",
   "minimumShell": "0.5.5",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.12.0.zip",
-  "sha256": "828fed197cba137f38c6c9fc9b736f973b5cc6ff58af031c7207c07e789a5cdc",
+  "sha256": "7c6c8bd3d009304469d621753a575bb53bda3050e47d7e38ce29f0a2a40e3863",
   "notes": "Automatic profile scan: sharing a supported public social profile into Crowd Orbit now triggers a native public-metadata scan before the existing evidence analysis runs. The scan is restricted to supported social domains, follows only same-allowlist HTTPS redirects, uses no login cookies, and reports clearly when a platform does not expose enough public metadata. State continuity and stable Orbit layout remain intact."
 }
