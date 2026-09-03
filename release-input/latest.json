@@ -1,5 +1,5 @@
 {
-  "uiVersion": "0.12.1",
-  "minimumShell": "0.5.6",
-  "notes": "Visible profile scan pairing: Crowd Orbit now prioritises visible social profile text and public metadata ahead of generic share wording, removes labels such as Instagram Share from identity evidence, and adds an in-app setup/status card for the Android Visible Profile Scan service. Profile snapshots remain local, short-lived and restricted to supported social apps."
+  "uiVersion": "0.13.0",
+  "minimumShell": "0.5.7",
+  "notes": "Official Instagram integration: shared Instagram professional profiles are looked up through a dedicated Crowd Orbit / SBM Meta connection before fallback evidence. Settings now includes encrypted device-local Meta connection and test controls. Generic platform labels such as Instagram can no longer be treated as a person's name, and missing audience data is not presented as a verified zero."
 }
