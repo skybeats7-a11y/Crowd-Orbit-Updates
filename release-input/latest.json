@@ -1,5 +1,5 @@
 {
   "uiVersion": "0.13.0",
   "minimumShell": "0.5.7",
-  "notes": "Official Instagram integration: shared Instagram professional profiles are looked up through a dedicated Crowd Orbit / SBM Meta connection before fallback evidence. Settings now includes encrypted device-local Meta connection and test controls. Generic platform labels such as Instagram can no longer be treated as a person's name, and missing audience data is not presented as a verified zero."
+  "notes": "Official Instagram integration: shared Instagram professional profiles are looked up through a dedicated Crowd Orbit / SBM Meta connection before fallback evidence. Settings includes encrypted device-local Meta connection and live lookup test controls. Generic platform labels such as Instagram can no longer be treated as a person's name, missing audience data is not presented as a verified zero, and the stable Orbit/share-state fixes remain active."
 }
