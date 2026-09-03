@@ -2,6 +2,6 @@
   "uiVersion": "0.12.1",
   "minimumShell": "0.5.6",
   "bundleUrl": "https://raw.githubusercontent.com/skybeats7-a11y/Crowd-Orbit-Updates/main/ui-0.12.1.zip",
-  "sha256": "f94ed6253945169d4b9b5bf41b09baa7b180d305ccaf29fe894089653690b3d1",
+  "sha256": "caf4b27d02767497db64923eb7574b95959cf4648e0eb94df666c6b75839c959",
   "notes": "Visible profile scan pairing: Crowd Orbit now prioritises visible social profile text and public metadata ahead of generic share wording, removes labels such as Instagram Share from identity evidence, and adds an in-app setup/status card for the Android Visible Profile Scan service. Profile snapshots remain local, short-lived and restricted to supported social apps."
 }
